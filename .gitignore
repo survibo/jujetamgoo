@@ -6,3 +6,4 @@ checkpoints/
 pytorch-env/
 .venv/
 .venv312/
+outputs/
