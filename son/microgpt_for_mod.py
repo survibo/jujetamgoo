@@ -10,21 +10,44 @@ import math     # math.log, math.exp
 import random   # random.seed, random.choices, random.gauss, random.shuffle
 random.seed(42) # Let there be order among chaos
 
-# Let there be a Dataset `docs`: list[str] of documents (e.g. a list of names)
-if not os.path.exists('input.txt'):
-    import urllib.request
-    names_url = 'https://raw.githubusercontent.com/karpathy/makemore/988aa59/names.txt'
-    urllib.request.urlretrieve(names_url, 'input.txt')
-docs = [line.strip() for line in open('input.txt') if line.strip()]
+# Modulo addition task setting
+MODULUS = 23
+INPUT_PATH = 'input.txt'
+if MODULUS < 2:
+    raise ValueError("MODULUS must be at least 2")
+
+# Let there be a Dataset `docs`: list[str] of modulo addition examples, e.g. "4 + 14 = 18"
+if not os.path.exists(INPUT_PATH):
+    raise FileNotFoundError(f"expected {INPUT_PATH} with lines like '4 + 14 = 18'")
+docs = [line.strip() for line in open(INPUT_PATH) if line.strip()]
 random.shuffle(docs)
 print(f"num docs: {len(docs)}")
 
+def parse_example(doc):
+    parts = doc.split()
+    if len(parts) != 5 or parts[1] != '+' or parts[3] != '=':
+        raise ValueError(f"bad example format: {doc!r}")
+    a, b, target = int(parts[0]), int(parts[2]), int(parts[4])
+    if not (0 <= a < MODULUS and 0 <= b < MODULUS and 0 <= target < MODULUS):
+        raise ValueError(f"example out of range for MODULUS={MODULUS}: {doc!r}")
+    expected = (a + b) % MODULUS
+    if target != expected:
+        raise ValueError(f"wrong target for MODULUS={MODULUS}: {doc!r}, expected {expected}")
+    return a, b, target
+
+examples = [parse_example(doc) for doc in docs]
+
 # Let there be a Tokenizer to translate strings to sequences of integers ("tokens") and back
-utokens = sorted(set(' '.join(docs).split())) # unique whitespace-separated tokens become token ids 0..n-1
+utokens = [str(i) for i in range(MODULUS)] + ['+', '='] # number/operator tokens become token ids 0..n-1
+stoi = {token: i for i, token in enumerate(utokens)}
+itos = {i: token for token, i in stoi.items()}
 BOS = len(utokens) # token id for a special Beginning of Sequence (BOS) token
 vocab_size = len(utokens) + 1 # total number of unique tokens, +1 is for BOS
 print(f"vocab size: {vocab_size}")
 print(utokens)
+
+def encode_prompt(a, b):
+    return [BOS, stoi[str(a)], stoi['+'], stoi[str(b)], stoi['=']]
 
 # Let there be Autograd to recursively apply the chain rule through a computation graph
 class Value:
@@ -74,7 +97,7 @@ class Value:
 # Initialize the parameters, to store the knowledge of the model
 n_layer = 1     # depth of the transformer neural network (number of layers)
 n_embd = 16     # width of the network (embedding dimension)
-block_size = 16 # maximum context length of the attention window
+block_size = 5  # maximum context length of the attention window: BOS a + b =
 n_head = 4      # number of attention heads
 head_dim = n_embd // n_head # derived dimension of each head
 matrix = lambda nout, nin, std=0.08: [[Value(random.gauss(0, std)) for _ in range(nin)] for _ in range(nout)]
@@ -152,21 +175,16 @@ v = [0.0] * len(params) # second moment buffer
 num_steps = 1000 # number of training steps
 for step in range(num_steps):
 
-    # Take single document, tokenize it, surround it with BOS special token on both sides
-    doc = docs[step % len(docs)]
-    tokens = [BOS] + [utokens.index(token) for token in doc.split()] + [BOS]
-    n = min(block_size, len(tokens) - 1)
+    # Feed "BOS a + b =" and train only the next-token prediction for the answer.
+    a, b, target = examples[step % len(examples)]
+    prompt_tokens = encode_prompt(a, b)
+    target_id = stoi[str(target)]
 
-    # Forward the token sequence through the model, building up the computation graph all the way to the loss
     keys, values = [[] for _ in range(n_layer)], [[] for _ in range(n_layer)]
-    losses = []
-    for pos_id in range(n):
-        token_id, target_id = tokens[pos_id], tokens[pos_id + 1]
+    for pos_id, token_id in enumerate(prompt_tokens):
         logits = gpt(token_id, pos_id, keys, values)
-        probs = softmax(logits)
-        loss_t = -probs[target_id].log()
-        losses.append(loss_t)
-    loss = (1 / n) * sum(losses) # final average loss over the document sequence. May yours be low.
+    probs = softmax(logits)
+    loss = -probs[target_id].log()
 
     # Backward the loss, calculating the gradients with respect to all model parameters
     loss.backward()
@@ -183,18 +201,33 @@ for step in range(num_steps):
 
     print(f"step {step+1:4d} / {num_steps:4d} | loss {loss.data:.4f}", end='\r')
 
-# Inference: may the model babble back to us
-temperature = 0.5 # in (0, 1], control the "creativity" of generated text, low to high
-print("\n--- inference (new, hallucinated names) ---")
-for sample_idx in range(20):
+def predict(a, b):
+    prompt_tokens = encode_prompt(a, b)
     keys, values = [[] for _ in range(n_layer)], [[] for _ in range(n_layer)]
-    token_id = BOS
-    sample = []
-    for pos_id in range(block_size):
+    for pos_id, token_id in enumerate(prompt_tokens):
         logits = gpt(token_id, pos_id, keys, values)
-        probs = softmax([l / temperature for l in logits])
-        token_id = random.choices(range(vocab_size), weights=[p.data for p in probs])[0]
-        if token_id == BOS:
-            break
-        sample.append(utokens[token_id])
-    print(f"sample {sample_idx+1:2d}: {' '.join(sample)}")
+    pred_id = max(range(MODULUS), key=lambda i: logits[i].data)
+    return int(itos[pred_id])
+
+# Inference: evaluate all modulo-addition cases
+print("\n--- evaluation ---")
+correct = 0
+total = 0
+for a in range(MODULUS):
+    for b in range(MODULUS):
+        pred = predict(a, b)
+        target = (a + b) % MODULUS
+        correct += pred == target
+        total += 1
+
+print(f"accuracy: {correct}/{total} = {correct / total:.3f}")
+print("--- samples ---")
+sample_pairs = [
+    (0, 0),
+    (1 % MODULUS, (MODULUS // 3) % MODULUS),
+    (MODULUS // 4, (MODULUS // 2 + 3) % MODULUS),
+    (MODULUS - 4, MODULUS - 5),
+    (MODULUS - 1, MODULUS - 1),
+]
+for a, b in sample_pairs:
+    print(f"{a} + {b} = {predict(a, b)} (target {(a + b) % MODULUS})")
