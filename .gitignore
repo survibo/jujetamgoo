@@ -5,3 +5,4 @@ venv/
 checkpoints/
 pytorch-env/
 .venv/
+.venv312/
