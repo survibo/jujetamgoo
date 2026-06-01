@@ -14,6 +14,7 @@ try:
 except ModuleNotFoundError:
     raise ModuleNotFoundError("PyTorch is required to run this file. Install torch first.") from None
 
+
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 print(device)
 
@@ -60,9 +61,9 @@ def encode_prompt(a, b):
 
 # Initialize the model hyperparameters
 n_layer = 1     # depth of the transformer neural network (number of layers)
-n_embd = 16     # width of the network (embedding dimension)
+n_embd = 12     # width of the network (embedding dimension)
 block_size = 2  # maximum context length of the attention window: a b
-n_head = 4      # number of attention heads
+n_head = 3      # number of attention heads
 head_dim = n_embd // n_head # derived dimension of each head
 
 class RMSNorm(nn.Module):
@@ -149,13 +150,35 @@ params = list(model.parameters())
 print(f"num params: {sum(p.numel() for p in params)}")
 print(f"device: {device}")
 
+@torch.no_grad()
+def predict(a, b):
+    was_training = model.training
+    model.eval()
+    prompt_tokens = torch.tensor([encode_prompt(a, b)], dtype=torch.long, device=device)
+    logits = model(prompt_tokens)
+    pred_id = int(torch.argmax(logits[0, -1, :]).item())
+    if was_training:
+        model.train()
+    return int(itos[pred_id])
+
+def evaluate_accuracy():
+    correct = 0
+    total = 0
+    for a in range(MODULUS):
+        for b in range(MODULUS):
+            pred = predict(a, b)
+            target = (a + b) % MODULUS
+            correct += pred == target
+            total += 1
+    return correct, total, correct / total
+
 # Let there be Adam, the blessed optimizer and its buffers
 learning_rate, beta1, beta2, eps_adam = 0.01, 0.85, 0.99, 1e-8
 optimizer = torch.optim.Adam(params, lr=learning_rate, betas=(beta1, beta2), eps=eps_adam)
 
 # Repeat in sequence
-num_steps = 1200 # number of training steps
-log_every = 50
+num_steps = 4000 # number of training steps
+log_every = 100
 for step in range(num_steps):
 
     # Feed "a b" and train only the next-token prediction for the answer.
@@ -177,28 +200,13 @@ for step in range(num_steps):
     optimizer.step()
 
     if (step + 1) % log_every == 0 or step == 0:
-        print(f"step {step+1:4d} / {num_steps:4d} | loss {loss.item():.4f}")
-
-@torch.no_grad()
-def predict(a, b):
-    model.eval()
-    prompt_tokens = torch.tensor([encode_prompt(a, b)], dtype=torch.long, device=device)
-    logits = model(prompt_tokens)
-    pred_id = int(torch.argmax(logits[0, -1, :]).item())
-    return int(itos[pred_id])
+        correct, total, acc = evaluate_accuracy()
+        print(f"step {step+1:4d} / {num_steps:4d} | loss {loss.item():.4f} | accuracy {correct}/{total} = {acc:.3f}")
 
 # Inference: evaluate all modulo-addition cases
 print("\n--- evaluation ---")
-correct = 0
-total = 0
-for a in range(MODULUS):
-    for b in range(MODULUS):
-        pred = predict(a, b)
-        target = (a + b) % MODULUS
-        correct += pred == target
-        total += 1
-
-print(f"accuracy: {correct}/{total} = {correct / total:.3f}")
+correct, total, acc = evaluate_accuracy()
+print(f"accuracy: {correct}/{total} = {acc:.3f}")
 print("--- samples ---")
 sample_pairs = [
     (0, 0),
