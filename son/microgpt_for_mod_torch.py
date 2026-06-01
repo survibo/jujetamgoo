@@ -62,9 +62,9 @@ def encode_prompt(a, b):
 
 # Initialize the model hyperparameters
 n_layer = 1     # depth of the transformer neural network (number of layers)
-n_embd = 12     # width of the network (embedding dimension)
+n_embd = 3     # width of the network (embedding dimension)
 block_size = 2  # maximum context length of the attention window: a b
-n_head = 3      # number of attention heads
+n_head = 1      # number of attention heads
 head_dim = n_embd // n_head # derived dimension of each head
 
 class RMSNorm(nn.Module):
@@ -227,8 +227,8 @@ learning_rate, beta1, beta2, eps_adam = 0.01, 0.85, 0.99, 1e-8
 optimizer = torch.optim.Adam(params, lr=learning_rate, betas=(beta1, beta2), eps=eps_adam)
 
 # Repeat in sequence
-num_steps = 3000 # number of training steps
-log_every = 100
+num_steps = 100000 # number of training steps
+log_every = 5000
 batch_size = len(examples)
 example_order = list(range(len(examples)))
 batch_cursor = 0
