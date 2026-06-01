@@ -2,5 +2,7 @@
 __pycache__/
 *.pyc
 venv/
+checkpoints/
 pytorch-env/
 .venv/
+.venv312/
