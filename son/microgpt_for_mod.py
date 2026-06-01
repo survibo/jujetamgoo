@@ -38,16 +38,15 @@ def parse_example(doc):
 examples = [parse_example(doc) for doc in docs]
 
 # Let there be a Tokenizer to translate strings to sequences of integers ("tokens") and back
-utokens = [str(i) for i in range(MODULUS)] + ['+', '='] # number/operator tokens become token ids 0..n-1
+utokens = [str(i) for i in range(MODULUS)] # number tokens become token ids 0..n-1
 stoi = {token: i for i, token in enumerate(utokens)}
 itos = {i: token for token, i in stoi.items()}
-BOS = len(utokens) # token id for a special Beginning of Sequence (BOS) token
-vocab_size = len(utokens) + 1 # total number of unique tokens, +1 is for BOS
+vocab_size = len(utokens) # total number of unique tokens
 print(f"vocab size: {vocab_size}")
 print(utokens)
 
 def encode_prompt(a, b):
-    return [BOS, stoi[str(a)], stoi['+'], stoi[str(b)], stoi['=']]
+    return [stoi[str(a)], stoi[str(b)]]
 
 # Let there be Autograd to recursively apply the chain rule through a computation graph
 class Value:
@@ -97,7 +96,7 @@ class Value:
 # Initialize the parameters, to store the knowledge of the model
 n_layer = 1     # depth of the transformer neural network (number of layers)
 n_embd = 16     # width of the network (embedding dimension)
-block_size = 5  # maximum context length of the attention window: BOS a + b =
+block_size = 2  # maximum context length of the attention window: a b
 n_head = 4      # number of attention heads
 head_dim = n_embd // n_head # derived dimension of each head
 matrix = lambda nout, nin, std=0.08: [[Value(random.gauss(0, std)) for _ in range(nin)] for _ in range(nout)]
@@ -172,10 +171,11 @@ m = [0.0] * len(params) # first moment buffer
 v = [0.0] * len(params) # second moment buffer
 
 # Repeat in sequence
-num_steps = 1000 # number of training steps
+num_steps = 1200 # number of training steps
+log_every = 50
 for step in range(num_steps):
 
-    # Feed "BOS a + b =" and train only the next-token prediction for the answer.
+    # Feed "a b" and train only the next-token prediction for the answer.
     a, b, target = examples[step % len(examples)]
     prompt_tokens = encode_prompt(a, b)
     target_id = stoi[str(target)]
@@ -199,7 +199,8 @@ for step in range(num_steps):
         p.data -= lr_t * m_hat / (v_hat ** 0.5 + eps_adam)
         p.grad = 0
 
-    print(f"step {step+1:4d} / {num_steps:4d} | loss {loss.data:.4f}", end='\r')
+    if (step + 1) % log_every == 0 or step == 0:
+        print(f"step {step+1:4d} / {num_steps:4d} | loss {loss.data:.4f}")
 
 def predict(a, b):
     prompt_tokens = encode_prompt(a, b)
