@@ -20,11 +20,11 @@ random.shuffle(docs)
 print(f"num docs: {len(docs)}")
 
 # Let there be a Tokenizer to translate strings to sequences of integers ("tokens") and back
-uchars = sorted(set(' '.join(docs))) # unique characters in the dataset become token ids 0..n-1
-BOS = len(uchars) # token id for a special Beginning of Sequence (BOS) token
-vocab_size = len(uchars) + 1 # total number of unique tokens, +1 is for BOS
+utokens = sorted(set(' '.join(docs).split())) # unique whitespace-separated tokens become token ids 0..n-1
+BOS = len(utokens) # token id for a special Beginning of Sequence (BOS) token
+vocab_size = len(utokens) + 1 # total number of unique tokens, +1 is for BOS
 print(f"vocab size: {vocab_size}")
-print(uchars)
+print(utokens)
 
 # Let there be Autograd to recursively apply the chain rule through a computation graph
 class Value:
@@ -74,7 +74,7 @@ class Value:
 # Initialize the parameters, to store the knowledge of the model
 n_layer = 1     # depth of the transformer neural network (number of layers)
 n_embd = 16     # width of the network (embedding dimension)
-block_size = 16 # maximum context length of the attention window (note: the longest name is 15 characters)
+block_size = 16 # maximum context length of the attention window
 n_head = 4      # number of attention heads
 head_dim = n_embd // n_head # derived dimension of each head
 matrix = lambda nout, nin, std=0.08: [[Value(random.gauss(0, std)) for _ in range(nin)] for _ in range(nout)]
@@ -154,7 +154,7 @@ for step in range(num_steps):
 
     # Take single document, tokenize it, surround it with BOS special token on both sides
     doc = docs[step % len(docs)]
-    tokens = [BOS] + [uchars.index(ch) for ch in doc] + [BOS]
+    tokens = [BOS] + [utokens.index(token) for token in doc.split()] + [BOS]
     n = min(block_size, len(tokens) - 1)
 
     # Forward the token sequence through the model, building up the computation graph all the way to the loss
@@ -196,5 +196,5 @@ for sample_idx in range(20):
         token_id = random.choices(range(vocab_size), weights=[p.data for p in probs])[0]
         if token_id == BOS:
             break
-        sample.append(uchars[token_id])
-    print(f"sample {sample_idx+1:2d}: {''.join(sample)}")
+        sample.append(utokens[token_id])
+    print(f"sample {sample_idx+1:2d}: {' '.join(sample)}")
