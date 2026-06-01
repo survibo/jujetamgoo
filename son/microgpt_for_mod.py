@@ -171,8 +171,8 @@ m = [0.0] * len(params) # first moment buffer
 v = [0.0] * len(params) # second moment buffer
 
 # Repeat in sequence
-num_steps = 1000 # number of training steps
-log_every = 100
+num_steps = 1200 # number of training steps
+log_every = 50
 for step in range(num_steps):
 
     # Feed "a b" and train only the next-token prediction for the answer.
