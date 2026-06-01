@@ -1,0 +1,18 @@
+# Keep text files stable across Windows and macOS.
+* text=auto eol=lf
+
+# Windows command scripts conventionally need CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary files should never be line-ending normalized.
+*.7z binary
+*.bmp binary
+*.gif binary
+*.ico binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.png binary
+*.webp binary
+*.zip binary
