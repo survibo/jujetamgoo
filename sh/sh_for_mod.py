@@ -11,16 +11,16 @@ import random   # random.seed, random.gauss, random.shuffle
 random.seed(42) # Let there be order among chaos
 
 # Let there be a Dataset `docs`: list[str] of documents (e.g. a list of names)
-if not os.path.exists('input.txt'):
-    import urllib.request
-    names_url = 'https://raw.githubusercontent.com/karpathy/makemore/988aa59/names.txt'
-    urllib.request.urlretrieve(names_url, 'input.txt')
-docs = [line.strip() for line in open('input.txt') if line.strip()]
+docs = [line.strip() for line in open('input_sh.txt') if line.strip()]
 random.shuffle(docs)
 print(f"num docs: {len(docs)}")
 
 MOD = 23
 num_eval_samples = 20
+train_answer_only = True
+include_stop_loss = True
+eval_interval = 200
+num_eval_steps = 50
 
 # Let there be a Tokenizer to translate strings to sequences of integers ("tokens") and back
 utokens = sorted(set(' '.join(docs).split())) # unique whitespace-separated tokens become token ids 0..n-1
@@ -33,7 +33,7 @@ print(utokens)
 required_tokens = ['+', '='] + [str(i) for i in range(MOD)]
 for token in required_tokens:
     if token not in stoi:
-        raise ValueError(f"token {token!r} is missing from input.txt; regenerate data for MOD={MOD}")
+        raise ValueError(f"token {token!r} is missing from input_sh.txt; regenerate data for MOD={MOD}")
 
 # Let there be Autograd to recursively apply the chain rule through a computation graph
 class Value:
@@ -158,24 +158,43 @@ m = [0.0] * len(params) # first moment buffer
 v = [0.0] * len(params) # second moment buffer
 
 # Repeat in sequence
-num_steps = 2000 # number of training steps
+num_steps = 4000 # number of training steps
 for step in range(num_steps):
 
     # Take single document, tokenize it, surround it with BOS special token on both sides
     doc = docs[step % len(docs)]
-    tokens = [BOS] + [stoi[token] for token in doc.split()] + [BOS]
+    doc_tokens = doc.split()
+    if '=' not in doc_tokens:
+        continue
+
+    eq_idx = doc_tokens.index('=')
+    tokens = [BOS] + [stoi[token] for token in doc_tokens] + [BOS]
+    eq_pos = eq_idx + 1
     n = min(block_size, len(tokens) - 1)
 
-    # Forward the token sequence through the model, building up the computation graph all the way to the loss
+    need_positions = eq_pos + (2 if include_stop_loss else 1)
+    if need_positions > n:
+        continue
+
+    # Forward the token sequence, computing loss only on answer and stop positions
     keys, values = [[] for _ in range(n_layer)], [[] for _ in range(n_layer)]
-    losses = []
+    relevant_losses = []
     for pos_id in range(n):
         token_id, target_id = tokens[pos_id], tokens[pos_id + 1]
         logits = gpt(token_id, pos_id, keys, values)
         probs = softmax(logits)
-        loss_t = -probs[target_id].log()
-        losses.append(loss_t)
-    loss = (1 / n) * sum(losses) # final average loss over the document sequence. May yours be low.
+
+        is_answer = pos_id == eq_pos
+        is_stop = pos_id == eq_pos + 1
+
+        if is_answer or (include_stop_loss and is_stop):
+            loss_t = -probs[target_id].log()
+            relevant_losses.append(loss_t)
+
+    if not relevant_losses:
+        continue
+
+    loss = (1 / len(relevant_losses)) * sum(relevant_losses)
 
     # Backward the loss, calculating the gradients with respect to all model parameters
     loss.backward()
@@ -190,7 +209,25 @@ for step in range(num_steps):
         p.data -= lr_t * m_hat / (v_hat ** 0.5 + eps_adam)
         p.grad = 0
 
-    print(f"step {step+1:4d} / {num_steps:4d} | loss {loss.data:.4f}", end='\r')
+    if step % eval_interval == 0 and step > 0:
+        correct = 0
+        for _ in range(num_eval_steps):
+            a = random.randrange(MOD)
+            b = random.randrange(MOD)
+            expected = str((a + b) % MOD)
+            prompt_tokens = [BOS, stoi[str(a)], stoi['+'], stoi[str(b)], stoi['=']]
+            keys_eval, values_eval = [[] for _ in range(n_layer)], [[] for _ in range(n_layer)]
+            logits_eval = None
+            for pos_id, token_id in enumerate(prompt_tokens):
+                logits_eval = gpt(token_id, pos_id, keys_eval, values_eval)
+            token_id = max(range(vocab_size), key=lambda i: logits_eval[i].data)
+            predicted = utokens[token_id]
+            if predicted == expected:
+                correct += 1
+        acc = correct / num_eval_steps * 100
+        print(f"\nstep {step+1:4d} / {num_steps:4d} | loss {loss.data:.4f} | eval_acc {acc:.1f}%")
+    else:
+        print(f"step {step+1:4d} / {num_steps:4d} | loss {loss.data:.4f}", end='\r')
 
 # Inference: condition on "a + b =" and greedily decode only the modular result.
 print(f"\n--- inference (mod {MOD} addition) ---")
