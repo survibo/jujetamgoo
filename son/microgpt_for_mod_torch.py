@@ -223,7 +223,7 @@ def save_number_vectors(raw_path, effective_path):
     write_vectors(effective_path, effective_rows)
 
 # Let there be Adam, the blessed optimizer and its buffers
-learning_rate, beta1, beta2, eps_adam = 0.01, 0.85, 0.99, 1e-8
+learning_rate, beta1, beta2, eps_adam = 0.001, 0.85, 0.99, 1e-8
 optimizer = torch.optim.Adam(params, lr=learning_rate, betas=(beta1, beta2), eps=eps_adam)
 
 # Repeat in sequence
