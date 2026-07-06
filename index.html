@@ -576,7 +576,7 @@
               font-size: 27px;
             "
           >
-            <span class="txt-muted">복습 — 입력 (3,1,4,1,5) →</span>
+            <span class="txt-muted">입력 (3,1,4,1,5) →</span>
             <span
               ><strong class="txt-accent">기준 A</strong> 오름차순
               (1,1,3,4,5)</span
@@ -598,7 +598,7 @@
               <div class="hypo-card" style="padding: 30px 34px">
                 <span class="hypo-num">①</span
                 ><span class="hypo-body"
-                  >더 복잡한 규칙(B·C)에서는 기준선(A)에서보다 Grokking이
+                  >더 복잡한 규칙(B·C)에서는 기준(A)에서보다 Grokking이
                   <strong>더 늦게 나타나거나, 나타나지 않을 것</strong></span
                 >
               </div>
@@ -625,7 +625,7 @@
               <div class="box box-green">
                 <div class="box-body" style="font-size: 31px">
                   Grokking 연구를 <strong>전역 순서 제약을 가진 '정렬'</strong>
-                  과제로 확장 (기존 문장 변환·복사 보고와 구별되는 지점)
+                  과제로 확장 <br/>기존 문장 변환·복사 보고와 구별됨
                 </div>
               </div>
               <div class="box box-gray">
@@ -658,6 +658,55 @@
         </div>
         <div class="cover-line"></div>
       </div>
+
+      <!-- ═══════════ 예비 실험 팝업 (슬라이드 3에서 → 키로 열림) ═══════════ -->
+      <div id="popup-exp" class="popup-overlay" hidden>
+        <div class="popup-window">
+          <div class="popup-head">
+            <span class="popup-badge"
+              >예비 실험 — 직접 학습한 microGPT 변형 (60,416 params) · a + b mod
+              87 · AdamW wd=1.0 · 훈련 데이터 40%</span
+            >
+            <span class="popup-stageno" id="popup-stageno">1 / 3</span>
+          </div>
+          <div class="popup-body">
+            <div class="pstage" id="pstage-1">
+              <div class="term">
+                <div class="term-bar">
+                  <span class="tdot td-r"></span><span class="tdot td-y"></span
+                  ><span class="tdot td-g"></span>
+                  <span class="term-title"
+                    >pytorch-env/bin/python son/microgpt_for_mod_torch.py</span
+                  >
+                </div>
+                <pre id="term-out"></pre>
+              </div>
+              <div class="pcap">
+                실제 학습 과정 리플레이 (20,000 스텝, 빨리감기) — 훈련 정확도는
+                금방 100%, <strong>검증 정확도를 지켜보세요</strong>
+              </div>
+            </div>
+            <div class="pstage" id="pstage-2" hidden>
+              <div class="graph-wrap">
+                <canvas id="pop-acc" width="1480" height="600"></canvas>
+              </div>
+              <div class="pcap" id="pcap-acc">
+                같은 로그를 그래프로 — 암기(step 300) 후
+                <strong>2,350 스텝의 침묵</strong>, 그리고 급상승
+              </div>
+            </div>
+            <div class="pstage" id="pstage-3" hidden>
+              <div class="graph-wrap">
+                <canvas id="pop-emb" width="1480" height="600"></canvas>
+              </div>
+              <div class="pcap">
+                왜? — 87개 숫자의 임베딩(PCA)이 무질서에서
+                <strong>원형 구조</strong>로 재배열되며 일반화가 일어난다
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Navigation Bar -->
@@ -669,6 +718,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script src="grokking_data.js"></script>
     <script src="slide.js"></script>
   </body>
 </html>

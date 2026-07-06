@@ -21,10 +21,11 @@ torch.manual_seed(42)
 MODULUS = 87
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
-INPUT_PATH = os.path.join(PROJECT_ROOT, 'example4.txt')
+INPUT_PATH = os.path.join(PROJECT_ROOT, 'example1.txt')
 OUTPUT_DIR = os.path.join(PROJECT_ROOT, 'outputs')
 NUMBER_VECTOR_PATH = os.path.join(OUTPUT_DIR, 'number_vectors.txt')
 EFFECTIVE_NUMBER_VECTOR_PATH = os.path.join(OUTPUT_DIR, 'number_vectors_effective.txt')
+SNAPSHOT_DIR = os.path.join(OUTPUT_DIR, 'embedding_snapshots')
 if MODULUS < 2:
     raise ValueError("MODULUS must be at least 2")
 
@@ -173,18 +174,27 @@ def evaluate_accuracy():
             total += 1
     return correct, total, correct / total
 
+# Split evaluation: train pairs (seen during training) vs held-out pairs (never seen).
+# Grokking is only measurable on the held-out split — mixing them hides the delayed jump.
+train_eval_pairs = sorted({(a, b) for a, b, _ in examples})
+val_eval_pairs = [(a, b) for a in range(MODULUS) for b in range(MODULUS)
+                  if (a, b) not in set(train_eval_pairs)]
+if not val_eval_pairs:
+    raise ValueError("training file covers the full input space; no held-out pairs to measure generalization")
+print(f"train pairs: {len(train_eval_pairs)} | held-out pairs: {len(val_eval_pairs)}")
+
+def pairs_to_tensors(pairs):
+    inputs = torch.tensor([encode_prompt(a, b) for a, b in pairs], dtype=torch.long, device=device)
+    targets = torch.tensor([stoi[str((a + b) % MODULUS)] for a, b in pairs], dtype=torch.long, device=device)
+    return inputs, targets
+
+train_eval_inputs, train_eval_targets = pairs_to_tensors(train_eval_pairs)
+val_eval_inputs, val_eval_targets = pairs_to_tensors(val_eval_pairs)
+
 @torch.no_grad()
-def evaluate_metrics():
+def evaluate_split(inputs, targets):
     was_training = model.training
     model.eval()
-    inputs = []
-    targets = []
-    for a in range(MODULUS):
-        for b in range(MODULUS):
-            inputs.append(encode_prompt(a, b))
-            targets.append(stoi[str((a + b) % MODULUS)])
-    inputs = torch.tensor(inputs, dtype=torch.long, device=device)
-    targets = torch.tensor(targets, dtype=torch.long, device=device)
     logits = model(inputs)[:, -1, :]
     loss = F.cross_entropy(logits, targets).item()
     preds = torch.argmax(logits, dim=-1)
@@ -222,16 +232,37 @@ def save_number_vectors(raw_path, effective_path):
         effective_rows.append((f"{number}\tpos1", pos1_vectors[number].tolist()))
     write_vectors(effective_path, effective_rows)
 
-# Let there be Adam, the blessed optimizer and its buffers
+@torch.no_grad()
+def save_embedding_snapshot(step):
+    # One file per training stage: raw wte rows, used for the disorder -> circle animation
+    raw_vectors = model.wte.weight.detach().cpu()
+    rows = [(number, raw_vectors[stoi[str(number)]].tolist()) for number in range(MODULUS)]
+    write_vectors(os.path.join(SNAPSHOT_DIR, f"step_{step:06d}.txt"), rows)
+
+# Let there be AdamW: strong weight decay is the key driver of grokking
+# (Power et al. 2022 / Nanda et al. 2023 use AdamW with weight decay λ=1)
 learning_rate, beta1, beta2, eps_adam = 0.001, 0.85, 0.99, 1e-8
-optimizer = torch.optim.Adam(params, lr=learning_rate, betas=(beta1, beta2), eps=eps_adam)
+weight_decay = 1.0
+optimizer = torch.optim.AdamW(params, lr=learning_rate, betas=(beta1, beta2), eps=eps_adam,
+                              weight_decay=weight_decay)
 
 # Repeat in sequence
-num_steps = 30000 # number of training steps
-log_every = 100
+num_steps = 20000 # number of training steps
+log_every = 50
 batch_size = len(examples)
 example_order = list(range(len(examples)))
 batch_cursor = 0
+
+# Metrics CSV: every run self-records its curves (used for the slide animation)
+METRICS_LOG_PATH = os.path.join(OUTPUT_DIR, 'train_log.csv')
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+metrics_log = open(METRICS_LOG_PATH, 'w')
+metrics_log.write('step,train_loss,train_acc,val_loss,val_acc\n')
+
+# Embedding snapshots at a fixed cadence (+ init and final) so the
+# memorization -> grokking transition is captured wherever it happens
+snapshot_every = 250
+save_embedding_snapshot(0)
 for step in range(num_steps):
 
     if batch_cursor == 0:
@@ -254,21 +285,31 @@ for step in range(num_steps):
     optimizer.zero_grad(set_to_none=True)
     loss.backward()
 
-    # Adam optimizer update: update the model parameters based on the corresponding gradients
-    lr_t = learning_rate * (1 - step / num_steps) # linear learning rate decay
-    for group in optimizer.param_groups:
-        group['lr'] = lr_t
+    # AdamW update with a constant learning rate: grokking happens late in training,
+    # so the LR must not decay to zero before the transition
     optimizer.step()
 
     if (step + 1) % log_every == 0 or step == 0:
-        eval_loss, correct, total, acc = evaluate_metrics()
-        print(f"step {step+1:6d} / {num_steps:6d} | train loss {loss.item():.4f} | eval loss {eval_loss:.4f} | accuracy {correct}/{total} = {acc:.3f}")
+        train_loss, _, _, train_acc = evaluate_split(train_eval_inputs, train_eval_targets)
+        val_loss, _, _, val_acc = evaluate_split(val_eval_inputs, val_eval_targets)
+        print(f"step {step+1:6d} / {num_steps:6d} | train loss {train_loss:.4f} | train acc {train_acc:.3f} | val loss {val_loss:.4f} | val acc {val_acc:.3f}")
+        metrics_log.write(f"{step+1},{train_loss:.6f},{train_acc:.6f},{val_loss:.6f},{val_acc:.6f}\n")
+        metrics_log.flush()
 
-# Inference: evaluate all modulo-addition cases
+    if (step + 1) % snapshot_every == 0:
+        save_embedding_snapshot(step + 1)
+
+save_embedding_snapshot(num_steps)
+metrics_log.close()
+print(f"saved metrics log to {METRICS_LOG_PATH}")
+print(f"saved embedding snapshots to {SNAPSHOT_DIR}")
+
+# Inference: evaluate train and held-out splits separately
 print("\n--- evaluation ---")
-eval_loss, correct, total, acc = evaluate_metrics()
-print(f"eval loss: {eval_loss:.4f}")
-print(f"accuracy: {correct}/{total} = {acc:.3f}")
+train_loss, tc, tt, train_acc = evaluate_split(train_eval_inputs, train_eval_targets)
+val_loss, vc, vt, val_acc = evaluate_split(val_eval_inputs, val_eval_targets)
+print(f"train:    loss {train_loss:.4f} | accuracy {tc}/{tt} = {train_acc:.3f}")
+print(f"held-out: loss {val_loss:.4f} | accuracy {vc}/{vt} = {val_acc:.3f}")
 print("--- samples ---")
 sample_pairs = [
     (0, 0),

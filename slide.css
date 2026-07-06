@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap");
 
 :root {
   --c-bg: #f5f5f7;
@@ -759,3 +759,76 @@ body {
 .katex {
   font-size: inherit !important;
 }
+
+/* ---------- 예비 실험 팝업 ---------- */
+
+.popup-overlay {
+  position: absolute; inset: 0;
+  background: rgba(29, 29, 31, 0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 500;
+}
+.popup-overlay[hidden] { display: none; }
+
+.popup-window {
+  width: 1700px; height: 900px;
+  background: var(--c-bg);
+  border-radius: 20px;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  box-shadow: rgba(0, 0, 0, 0.35) 0 24px 80px;
+}
+
+.popup-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 22px 36px;
+  background: var(--c-white);
+  border-bottom: 1px solid var(--c-border);
+}
+.popup-badge { font-size: 26px; font-weight: 600; color: var(--c-accent); }
+.popup-stageno { font-size: 26px; font-weight: 600; color: var(--c-muted); }
+
+.popup-body { flex: 1; display: flex; align-items: stretch; justify-content: center; padding: 26px 36px 30px; }
+.pstage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
+.pstage[hidden] { display: none; }
+.pcap { font-size: 28px; color: var(--c-muted); text-align: center; }
+.pcap strong { color: var(--c-ink); font-weight: 600; }
+
+/* 가짜 터미널 */
+.term {
+  width: 1560px; height: 640px;
+  background: var(--c-dark);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.term-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px;
+  background: var(--c-tile-dark);
+}
+.tdot { width: 16px; height: 16px; border-radius: 50%; display: inline-block; }
+.td-r { background: #ff5f57; }
+.td-y { background: #febc2e; }
+.td-g { background: #28c840; }
+.term-title {
+  margin-left: 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 22px; color: rgba(255, 255, 255, 0.55);
+}
+#term-out {
+  flex: 1;
+  margin: 0; padding: 18px 26px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 21px; line-height: 1.5;
+  color: #d8d8dc;
+  overflow-y: auto;
+  overflow-x: hidden;
+  white-space: pre;
+}
+#term-out::-webkit-scrollbar { width: 10px; }
+#term-out::-webkit-scrollbar-track { background: transparent; }
+#term-out::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.22); border-radius: 5px; }
+#term-out .tl-val { color: var(--c-accent-dk); font-weight: 500; }
+#term-out .tl-note { color: #28c840; }
+#term-out .tl-dim { color: rgba(255, 255, 255, 0.4); }
