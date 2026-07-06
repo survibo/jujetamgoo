@@ -1,405 +1,658 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <title>정렬에서의 Grokking: 일반화 조건과 내부 구조 분석</title>
-  <link rel="stylesheet" href="slide.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-</head>
-<body>
-
-<div id="slide-viewport">
-
-  <!-- ═══════════ 1. COVER ═══════════ -->
-  <div class="slide slide-cover active" id="slide-1">
-    <div class="cover-inner">
-      <div class="cover-tag">2026 주제탐구(R&amp;E) 연구 제안 발표</div>
-      <h1 class="cover-title">정렬에서의 Grokking:<br>일반화 조건과 내부 구조 분석</h1>
-      <p class="cover-sub">암기를 넘어 — 모델은 언제, 어떻게 규칙을 깨치는가</p>
-      <div class="cover-meta">
-        <div>팀 어텐션 · 김서혁 · 손영우</div>
-        <div>지도교사 김준우</div>
+  <head>
+    <meta charset="UTF-8" />
+    <title>정렬에서의 Grokking: 일반화 조건과 내부 구조 분석</title>
+    <link rel="stylesheet" href="slide.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+    />
+  </head>
+  <body>
+    <div id="slide-viewport">
+      <!-- ═══════════ 1. COVER ═══════════ -->
+      <div class="slide slide-cover active" id="slide-1">
+        <div class="cover-inner">
+          <div class="cover-tag">2026 주제탐구(R&amp;E) 연구 제안 발표</div>
+          <h1 class="cover-title">
+            정렬에서의 Grokking:<br />일반화 조건과 내부 구조 분석
+          </h1>
+          <p class="cover-sub">
+            암기를 넘어 — 모델은 언제, 어떻게 규칙을 깨치는가
+          </p>
+          <div class="cover-meta">
+            <div>팀 어텐션 · 김서혁 · 손영우</div>
+            <div>지도교사 김준우</div>
+          </div>
+        </div>
+        <div class="cover-line"></div>
       </div>
-    </div>
-    <div class="cover-line"></div>
-  </div>
 
-  <!-- ═══════════ 2. TOC ═══════════ -->
-  <div class="slide" id="slide-2">
-    <div class="slide-header">
-      <span class="chapter-label">목차</span>
-      <span class="page-num">2 / 11</span>
-    </div>
-    <div class="title-zone">
-      <h1 class="slide-title">목차</h1>
-    </div>
-    <div class="content-zone top-210">
-      <ol class="toc-list">
-        <li class="toc-item"><span class="toc-num">01</span><span class="toc-text">연구 배경 — Grokking이란?</span><span class="toc-note">암기 뒤에 찾아오는 지연된 일반화</span></li>
-        <li class="toc-item"><span class="toc-num">02</span><span class="toc-text">선행 연구와 그 한계</span><span class="toc-note">답 하나를 맞히는 문제에 머문 기존 연구</span></li>
-        <li class="toc-item"><span class="toc-num">03</span><span class="toc-text">연구 목표와 독창성</span><span class="toc-note">왜 '정렬'인가</span></li>
-        <li class="toc-item"><span class="toc-num">04</span><span class="toc-text">연구 문제</span><span class="toc-note">발현 → 내부 구조 → 진행 양상</span></li>
-        <li class="toc-item"><span class="toc-num">05</span><span class="toc-text">실험 설계</span><span class="toc-note">세 가지 정렬 규칙 · 모델과 데이터</span></li>
-        <li class="toc-item"><span class="toc-num">06</span><span class="toc-text">연구 방법</span><span class="toc-note">연구 문제별 분석 계획</span></li>
-        <li class="toc-item"><span class="toc-num">07</span><span class="toc-text">예상 결과와 기대효과</span><span class="toc-note">어느 쪽이 나와도 해석 가능한 설계</span></li>
-      </ol>
-    </div>
-  </div>
+      <!-- ═══════════ 2. TOC ═══════════ -->
+      <div class="slide" id="slide-2">
+        <div class="slide-header">
+          <span class="chapter-label">목차</span>
+          <span class="page-num">2 / 11</span>
+        </div>
+        <div class="title-zone">
+          <h1 class="slide-title">목차</h1>
+        </div>
+        <div class="content-zone top-210">
+          <ol class="toc-list">
+            <li class="toc-item">
+              <span class="toc-num">01</span
+              ><span class="toc-text">연구 배경 — Grokking이란?</span
+              ><span class="toc-note">암기 뒤에 찾아오는 지연된 일반화</span>
+            </li>
+            <li class="toc-item">
+              <span class="toc-num">02</span
+              ><span class="toc-text">선행 연구와 그 한계</span
+              ><span class="toc-note"
+                >답 하나를 맞히는 문제에 머문 기존 연구</span
+              >
+            </li>
+            <li class="toc-item">
+              <span class="toc-num">03</span
+              ><span class="toc-text">연구 목표와 독창성</span
+              ><span class="toc-note">왜 '정렬'인가</span>
+            </li>
+            <li class="toc-item">
+              <span class="toc-num">04</span
+              ><span class="toc-text">연구 문제</span
+              ><span class="toc-note">발현 → 내부 구조 → 진행 양상</span>
+            </li>
+            <li class="toc-item">
+              <span class="toc-num">05</span
+              ><span class="toc-text">실험 설계</span
+              ><span class="toc-note">세 가지 정렬 규칙 · 모델과 데이터</span>
+            </li>
+            <li class="toc-item">
+              <span class="toc-num">06</span
+              ><span class="toc-text">연구 방법</span
+              ><span class="toc-note">연구 문제별 분석 계획</span>
+            </li>
+            <li class="toc-item">
+              <span class="toc-num">07</span
+              ><span class="toc-text">예상 결과와 기대효과</span
+              ><span class="toc-note">어느 쪽이 나와도 해석 가능한 설계</span>
+            </li>
+          </ol>
+        </div>
+      </div>
 
-  <!-- ═══════════ 3. S1 연구 배경 ═══════════ -->
-  <div class="slide" id="slide-3">
-    <div class="slide-header">
-      <span class="chapter-label">연구 배경</span>
-      <span class="page-num">3 / 11</span>
-    </div>
-    <div class="title-zone">
-      <h1 class="slide-title">Grokking이란?</h1>
-      <p class="slide-subtitle">다 외운 줄 알았던 모델이, 한참 뒤에 갑자기 규칙을 깨친다</p>
-    </div>
-    <div class="content-zone top-260" style="gap:24px;">
-      <div class="cols" style="align-items:center;">
-        <div class="col-6">
-          <div class="graph-wrap">
-            <canvas id="canvas-grokking" width="1000" height="560"></canvas>
-            <div class="legend">
-              <div class="legend-item"><div class="legend-line" style="background:#0066cc;"></div><span class="txt-sm">훈련 정확도</span></div>
-              <div class="legend-item"><div class="legend-line" style="background:#c0392b;"></div><span class="txt-sm">검증 정확도</span></div>
+      <!-- ═══════════ 3. S1 연구 배경 ═══════════ -->
+      <div class="slide" id="slide-3">
+        <div class="slide-header">
+          <span class="chapter-label">연구 배경</span>
+          <span class="page-num">3 / 11</span>
+        </div>
+        <div class="title-zone">
+          <h1 class="slide-title">Grokking이란?</h1>
+          <p class="slide-subtitle">
+            다 외운 줄 알았던 모델이, 한참 뒤에 갑자기 규칙을 깨친다
+          </p>
+        </div>
+        <div class="content-zone top-260" style="gap: 24px">
+          <div class="cols" style="align-items: center">
+            <div class="col-6">
+              <div class="graph-wrap">
+                <canvas id="canvas-grokking" width="1000" height="560"></canvas>
+                <div class="legend">
+                  <div class="legend-item">
+                    <div class="legend-line" style="background: #0066cc"></div>
+                    <span class="txt-sm">훈련 정확도</span>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-line" style="background: #c0392b"></div>
+                    <span class="txt-sm">검증 정확도</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="col"
+              style="display: flex; flex-direction: column; gap: 24px"
+            >
+              <div class="box box-blue">
+                <div class="box-title">GROKKING = 지연된 일반화</div>
+                <div class="box-body">
+                  훈련 데이터를 <strong>완전히 암기</strong>한 뒤에도 학습을
+                  계속하면, 어느 순간 처음 보는 문제까지 풀어내는 현상
+                </div>
+              </div>
+              <div class="box box-gray">
+                <div class="box-title">GROKKING GAP</div>
+                <div class="box-body">
+                  암기 완료 시점과 일반화 시점 사이의 간격 — 본 연구의 핵심
+                  측정량
+                </div>
+              </div>
+              <div class="txt-sm txt-muted" style="padding-left: 8px">
+                Power et al. (2022)이 최초 보고
+              </div>
             </div>
           </div>
-        </div>
-        <div class="col" style="display:flex;flex-direction:column;gap:24px;">
-          <div class="box box-blue">
-            <div class="box-title">GROKKING = 지연된 일반화</div>
-            <div class="box-body">훈련 데이터를 <strong>완전히 암기</strong>한 뒤에도 학습을 계속하면, 어느 순간 처음 보는 문제까지 풀어내는 현상</div>
+          <div class="box-dark txt-center">
+            "과적합 이후의 학습은 무의미하다"는 통념에 대한
+            <strong>반례</strong> — 이 현상이 본 연구의 출발점
           </div>
-          <div class="box box-gray">
-            <div class="box-title">GROKKING GAP</div>
-            <div class="box-body">암기 완료 시점과 일반화 시점 사이의 간격 — 본 연구의 핵심 측정량</div>
-          </div>
-          <div class="txt-sm txt-muted" style="padding-left:8px;">Power et al. (2022)이 최초 보고</div>
         </div>
       </div>
-      <div class="box-dark txt-center">"과적합 이후의 학습은 무의미하다"는 통념에 대한 <strong>반례</strong> — 이 현상이 본 연구의 출발점</div>
-    </div>
-  </div>
 
-  <!-- ═══════════ 4. S2 선행 연구 ═══════════ -->
-  <div class="slide" id="slide-4">
-    <div class="slide-header">
-      <span class="chapter-label">선행 연구</span>
-      <span class="page-num">4 / 11</span>
-    </div>
-    <div class="title-zone">
-      <h1 class="slide-title">선행 연구와 그 한계</h1>
-    </div>
-    <div class="content-zone top-210 justify-between" style="gap:30px;">
-      <div class="cols" style="align-items:center;">
-        <div class="col" style="display:flex;flex-direction:column;gap:22px;">
-          <div class="box box-blue">
-            <div class="box-title">POWER ET AL. (2022)</div>
-            <div class="box-body" style="font-size:31px;">modular arithmetic에서 Grokking을 <strong>최초 보고</strong></div>
-          </div>
-          <div class="box box-blue">
-            <div class="box-title">NANDA ET AL. (2023)</div>
-            <div class="box-body" style="font-size:31px;">모델 내부에 <strong>Fourier 알고리즘 회로</strong>가 형성됨을 규명</div>
-          </div>
-          <div class="box box-blue">
-            <div class="box-title">LIU ET AL. (2022)</div>
-            <div class="box-body" style="font-size:31px;">임베딩이 <strong>원형 구조로 수렴</strong>하는 표현 학습 관점 제시</div>
-          </div>
+      <!-- ═══════════ 4. S2 선행 연구 ═══════════ -->
+      <div class="slide" id="slide-4">
+        <div class="slide-header">
+          <span class="chapter-label">선행 연구</span>
+          <span class="page-num">4 / 11</span>
         </div>
-        <div class="col-5">
-          <div class="graph-wrap">
-            <img src="assets/liu2022_embedding.png" alt="Liu et al. (2022) 임베딩 구조 변화" style="width:880px;">
-            <div class="graph-label">학습 단계별 임베딩: 무질서 → 과적합 → <strong>원형 구조</strong><br>출처: Liu et al. (2022), "Towards Understanding Grokking"</div>
-          </div>
+        <div class="title-zone">
+          <h1 class="slide-title">선행 연구와 그 한계</h1>
         </div>
-      </div>
-      <div class="box box-red">
-        <div class="box-title">공통 한계</div>
-        <div class="box-body">기존 연구는 모두 <strong>a ∘ b mod p → 답 하나</strong>를 맞히는 단일 토큰 분류 —
-        출력이 구조를 가진 <strong>수열</strong>인 경우는 아직 탐구되지 않았다</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════════ 5. S3 연구 목표·독창성 ═══════════ -->
-  <div class="slide" id="slide-5">
-    <div class="slide-header">
-      <span class="chapter-label">연구 목표</span>
-      <span class="page-num">5 / 11</span>
-    </div>
-    <div class="title-zone">
-      <h1 class="slide-title">왜 '정렬'인가 — 연구 목표와 독창성</h1>
-      <p class="slide-subtitle">출력 전체가 수열인 seq2seq 과제로 Grokking 연구를 확장한다</p>
-    </div>
-    <div class="content-zone top-260 justify-between" style="gap:28px;">
-      <ul class="bullet-list">
-        <li>답 하나 예측과 달리, 수열 출력은 <strong>출력 전체에 걸친 구조적 일관성</strong>이 필요하다</li>
-        <li>정렬은 원소 간 <strong>비교</strong>와 <strong>자리 배치</strong>가 결합된 가장 단순한 구조적 과제다</li>
-      </ul>
-      <div class="cols" style="gap:44px;">
-        <div class="compare-card" style="padding:36px;">
-          <div class="cc-head">기존 연구 — 단일 토큰 분류</div>
-          <div class="cc-main"><span>a ∘ b mod p</span><span class="flow-arrow">→</span><span class="tile in">c</span></div>
-          <div class="cc-cap">출력 = 토큰 하나</div>
-        </div>
-        <div class="compare-card accent" style="padding:36px;">
-          <div class="cc-head">본 연구 — seq2seq 정렬</div>
-          <div class="cc-main">
-            <div class="tile-row"><div class="tile in">3</div><div class="tile in">1</div><div class="tile in">4</div><div class="tile in">1</div><div class="tile in">5</div></div>
-            <span class="flow-arrow">→</span>
-            <div class="tile-row"><div class="tile r0">1</div><div class="tile r0">1</div><div class="tile r0">3</div><div class="tile r0">4</div><div class="tile r0">5</div></div>
-          </div>
-          <div class="cc-cap">출력 = 구조를 가진 수열 전체</div>
-        </div>
-      </div>
-      <div class="cols" style="gap:44px;">
-        <div class="box box-gray col">
-          <div class="box-title">독창성 1</div>
-          <div class="box-body" style="font-size:30px;">출력이 '구조를 가진 수열'인 <strong>첫 Grokking 연구</strong></div>
-        </div>
-        <div class="box box-gray col">
-          <div class="box-title">독창성 2</div>
-          <div class="box-body" style="font-size:30px;">정렬 규칙 자체를 <strong>실험 변수</strong>로 조작해 구조의 영향을 분리</div>
-        </div>
-      </div>
-      <div class="box-dark txt-center"><strong>연구 목표</strong> — 정렬 과제에서 Grokking의 발현 조건을 검증하고, 완성된 모델의 내부 표현 구조를 분석한다</div>
-    </div>
-  </div>
-
-  <!-- ═══════════ 6. S4 연구 문제 ═══════════ -->
-  <div class="slide" id="slide-6">
-    <div class="slide-header">
-      <span class="chapter-label">연구 문제</span>
-      <span class="page-num">6 / 11</span>
-    </div>
-    <div class="title-zone">
-      <h1 class="slide-title">연구 문제</h1>
-      <p class="slide-subtitle">발현 여부 → 내부 구조 → 진행 양상, 세 단계로 깊어지는 질문</p>
-    </div>
-    <div class="content-zone top-260 justify-between" style="gap:28px;">
-      <div class="rq-card">
-        <span class="rq-num">RQ 1</span>
-        <span class="rq-q">정렬 과제에서 Grokking이 <strong>발현되는가</strong>?<br>정렬 규칙에 따라 발현 여부와 시점이 어떻게 달라지는가?</span>
-        <span class="badge badge-blue rq-tag">발현 여부</span>
-      </div>
-      <div class="rq-card">
-        <span class="rq-num">RQ 2</span>
-        <span class="rq-q">Grokking이 완료된 모델의 <strong>내부 표현</strong>은 어떤 구조를 가지는가?</span>
-        <span class="badge badge-blue rq-tag">내부 구조</span>
-      </div>
-      <div class="rq-card">
-        <span class="rq-num">RQ 3</span>
-        <span class="rq-q">Grokking은 출력 전체에서 <strong>한 번에</strong> 일어나는가,<br>출력 <strong>그룹 단위</strong>로 나뉘어 일어나는가?</span>
-        <span class="badge badge-blue rq-tag">진행 양상</span>
-      </div>
-      <div class="box box-gray">
-        <div class="box-body" style="font-size:30px;">※ Grokking이 나타나지 않는 경우 역시 <strong>"어떤 구조가 일반화를 막는가"</strong>에 대한 유의미한 결과로 해석한다</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════════ 7. S5 실험 설계 ① ═══════════ -->
-  <div class="slide" id="slide-7">
-    <div class="slide-header">
-      <span class="chapter-label">실험 설계</span>
-      <span class="page-num">7 / 11</span>
-    </div>
-    <div class="title-zone">
-      <h1 class="slide-title">실험 설계 ① — 세 가지 정렬 규칙</h1>
-      <p class="slide-subtitle">정렬 키(항등 / 주기) × 위치 매핑(단조 / 비단조) — 두 개의 독립적인 축</p>
-    </div>
-    <div class="content-zone top-260" style="gap:22px;">
-      <div class="sort-diagram">
-        <div class="sort-input">
-          <span class="si-label">입력 수열</span>
-          <div class="tile-row"><div class="tile in">3</div><div class="tile in">1</div><div class="tile in">4</div><div class="tile in">1</div><div class="tile in">5</div></div>
-          <span class="txt-sm txt-muted">(순서는 무작위)</span>
-        </div>
-        <div class="sort-branches">
-          <div class="sort-col">
-            <div class="sc-arrow">↓</div>
-            <div class="sc-name">기준 A — 오름차순</div>
-            <div class="tile-row"><div class="tile">1</div><div class="tile">1</div><div class="tile">3</div><div class="tile">4</div><div class="tile">5</div></div>
-            <div class="sc-cap">값 그대로 작은 것부터<br><span class="txt-accent txt-bold">기준선</span></div>
-          </div>
-          <div class="sort-col">
-            <div class="sc-arrow">↓</div>
-            <div class="sc-name">기준 B — 잉여류 (mod 3)</div>
-            <div>
-              <div class="tile-row"><div class="tile r0">3</div><div class="tile r1">1</div><div class="tile r1">1</div><div class="tile r1">4</div><div class="tile r2">5</div></div>
-              <div class="residue-row"><span>0</span><span>1</span><span>1</span><span>1</span><span>2</span></div>
+        <div class="content-zone top-210 justify-between" style="gap: 30px">
+          <div class="cols" style="align-items: center">
+            <div
+              class="col"
+              style="display: flex; flex-direction: column; gap: 22px"
+            >
+              <div class="box box-blue">
+                <div class="box-title">POWER ET AL. (2022)</div>
+                <div class="box-body" style="font-size: 31px">
+                  modular arithmetic에서 Grokking을 <strong>최초 보고</strong>
+                </div>
+              </div>
+              <div class="box box-blue">
+                <div class="box-title">NANDA ET AL. (2023)</div>
+                <div class="box-body" style="font-size: 31px">
+                  모델 내부에 <strong>Fourier 알고리즘 회로</strong>가 형성됨을
+                  규명
+                </div>
+              </div>
+              <div class="box box-blue">
+                <div class="box-title">LIU ET AL. (2022)</div>
+                <div class="box-body" style="font-size: 31px">
+                  임베딩이 <strong>원형 구조로 수렴</strong>하는 표현 학습 관점
+                  제시
+                </div>
+              </div>
             </div>
-            <div class="sc-cap">나머지가 작은 묶음부터,<br>같은 묶음 안에서는 값 오름차순</div>
-          </div>
-          <div class="sort-col">
-            <div class="sc-arrow">↓</div>
-            <div class="sc-name">기준 C — 최솟값·최댓값 교번</div>
-            <div class="tile-row"><div class="tile">1</div><div class="tile">5</div><div class="tile">1</div><div class="tile">4</div><div class="tile">3</div></div>
-            <div class="sc-cap">최소 → 최대 → 2번째 최소 →<br>2번째 최대 → …</div>
-          </div>
-        </div>
-      </div>
-      <table class="class-table compact">
-        <thead>
-          <tr><th style="width:22%;">기준</th><th style="width:24%;">정렬 키</th><th style="width:24%;">위치 매핑</th><th>이 기준이 검증하는 것</th></tr>
-        </thead>
-        <tbody>
-          <tr><td class="cnt">A 오름차순</td><td>항등 (값 그대로)</td><td>단조</td><td>Grokking 발현의 기준선</td></tr>
-          <tr><td class="cnt">B 잉여류</td><td class="highlight">주기 (x mod m)</td><td>단조</td><td>키에 주기 구조가 들어가면?</td></tr>
-          <tr><td class="cnt">C 교번</td><td>항등 (값 그대로)</td><td class="highlight">비단조</td><td>순위와 자리의 대응이 꼬이면?</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ═══════════ 8. S6 실험 설계 ② ═══════════ -->
-  <div class="slide" id="slide-8">
-    <div class="slide-header">
-      <span class="chapter-label">실험 설계</span>
-      <span class="page-num">8 / 11</span>
-    </div>
-    <div class="title-zone">
-      <h1 class="slide-title">실험 설계 ② — 모델과 데이터</h1>
-      <p class="slide-subtitle">Grokking이 관찰될 수 있는 조건을 의도적으로 만든다</p>
-    </div>
-    <div class="content-zone top-260 justify-between" style="gap:30px;">
-      <div class="flow-row">
-        <div class="flow-node"><span class="fn-name">입력 수열</span><span class="fn-cap">(3, 1, 4, 1, 5)</span></div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-node accent"><span class="fn-name">Encoder</span><span class="fn-cap">입력 전체를 벡터로 변환</span></div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-node accent"><span class="fn-name">Decoder</span><span class="fn-cap">한 토큰씩 자기회귀 생성</span></div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-node dark"><span class="fn-name">출력 수열</span><span class="fn-cap">(1, 1, 3, 4, 5)</span></div>
-      </div>
-      <div class="txt-center txt-muted" style="font-size:27px;">세 정렬 기준 모두 <strong style="color:var(--c-ink);">같은 모델·같은 데이터 규모</strong>에서 학습 — 차이는 오직 정렬 규칙뿐</div>
-      <div class="cols" style="gap:40px;">
-        <div class="box box-blue col">
-          <div class="box-title">모델</div>
-          <div class="box-body" style="font-size:31px;">소규모 encoder-decoder<br>Transformer —<br>작아야 내부를 들여다볼 수 있다</div>
-        </div>
-        <div class="box box-blue col">
-          <div class="box-title">데이터</div>
-          <div class="box-body" style="font-size:31px;">값 10~12종, 길이 5~6의 수열을<br>multiset 단위로 분할 — 검증셋은<br><strong>처음 보는 값 조합</strong>만</div>
-        </div>
-        <div class="box box-blue col">
-          <div class="box-title">학습</div>
-          <div class="box-body" style="font-size:31px;">AdamW + <strong>강한 weight decay</strong><br>최대 10⁶ step 장기 학습<br>기준별 5개 시드 반복</div>
-        </div>
-      </div>
-      <div class="box-dark txt-center"><strong>설계 의도</strong> — 암기가 가능한 규모여야 Grokking을 관찰할 수 있다. 데이터를 일부러 작게 제한한다</div>
-    </div>
-  </div>
-
-  <!-- ═══════════ 9. S7 연구 방법 ═══════════ -->
-  <div class="slide" id="slide-9">
-    <div class="slide-header">
-      <span class="chapter-label">연구 방법</span>
-      <span class="page-num">9 / 11</span>
-    </div>
-    <div class="title-zone">
-      <h1 class="slide-title">연구 방법 — 연구 문제별 분석 계획</h1>
-    </div>
-    <div class="content-zone top-210" style="gap:34px;">
-      <table class="class-table">
-        <thead>
-          <tr><th style="width:20%;">연구 문제</th><th style="width:30%;">분석 방법</th><th>무엇을 확인하는가</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="cnt">RQ 1 발현</td>
-            <td>학습 곡선 분석</td>
-            <td>훈련·검증 정확도 곡선, Grokking gap을 정렬 기준 간 비교</td>
-          </tr>
-          <tr>
-            <td class="cnt">RQ 2 구조</td>
-            <td>내부 표현 분석</td>
-            <td>임베딩 차원 축소(PCA) — 수직선·군집·주기 구조가 실제로 형성되는가</td>
-          </tr>
-          <tr>
-            <td class="cnt">RQ 3 양상</td>
-            <td>출력 연속성 분석</td>
-            <td>출력 위치를 의미 단위로 묶은 그룹별 정확도 곡선 — 한 번에 vs 그룹별</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="cols" style="gap:40px;">
-        <div class="box box-gray col">
-          <div class="box-title">공정한 비교</div>
-          <div class="box-body" style="font-size:30px;">모델 크기 · 학습률 · 데이터 비율을 세 기준 모두에서 동일하게 고정</div>
-        </div>
-        <div class="box box-gray col">
-          <div class="box-title">우연 배제</div>
-          <div class="box-body" style="font-size:30px;">기준마다 시드 5개 반복 — 발현 여부와 시점을 분포로 보고</div>
-        </div>
-        <div class="box box-gray col">
-          <div class="box-title">미발현 대비</div>
-          <div class="box-body" style="font-size:30px;">최대 step까지 미발현이면 "관찰되지 않음"으로 기록하고 해석</div>
-        </div>
-      </div>
-      <div class="grow"></div>
-      <div class="box-dark txt-center">세 분석은 서로를 보완한다 — 곡선은 <strong>'언제'</strong>, 표현은 <strong>'무엇을'</strong>, 연속성은 <strong>'어떻게'</strong>를 답한다</div>
-    </div>
-  </div>
-
-  <!-- ═══════════ 10. S8 예상 결과·기대효과 ═══════════ -->
-  <div class="slide" id="slide-10">
-    <div class="slide-header">
-      <span class="chapter-label">예상 결과</span>
-      <span class="page-num">10 / 11</span>
-    </div>
-    <div class="title-zone">
-      <h1 class="slide-title">예상 결과와 기대효과</h1>
-      <p class="slide-subtitle">어느 쪽 결과가 나와도 해석 가능한 설계</p>
-    </div>
-    <div class="content-zone top-260 justify-between" style="gap:30px;">
-      <div class="cols" style="gap:56px;">
-        <div class="col" style="display:flex;flex-direction:column;gap:22px;">
-          <div class="section-label">예상 결과 (가설)</div>
-          <div class="hypo-card" style="padding:30px 34px;"><span class="hypo-num">①</span><span class="hypo-body">규칙이 복잡할수록(B·C) Grokking이 <strong>더 늦거나 나타나지 않을 것</strong></span></div>
-          <div class="hypo-card" style="padding:30px 34px;"><span class="hypo-num">②</span><span class="hypo-body">기준 B의 임베딩에서 <strong>주기·군집 구조</strong>가 관찰될 것</span></div>
-          <div class="hypo-card" style="padding:30px 34px;"><span class="hypo-num">③</span><span class="hypo-body">출력 <strong>그룹 단위의 부분적 Grokking</strong>이 관찰될 가능성</span></div>
-        </div>
-        <div class="col" style="display:flex;flex-direction:column;gap:22px;">
-          <div class="section-label">기대효과</div>
-          <div class="box box-green">
-            <div class="box-body" style="font-size:31px;">Grokking 연구를 단일 토큰 분류에서 <strong>구조적 수열 출력</strong>으로 확장하는 첫 시도</div>
-          </div>
-          <div class="box box-gray">
-            <div class="box-body" style="font-size:31px;">소규모 Transformer가 <strong>무엇을, 어떤 구조로 학습하는지</strong>에 대한 이해에 기여</div>
+            <div class="col-5">
+              <div class="graph-wrap">
+                <img
+                  src="assets/liu2022_embedding.png"
+                  alt="Liu et al. (2022) 임베딩 구조 변화"
+                  style="width: 880px"
+                />
+                <div class="graph-label">
+                  학습 단계별 임베딩: 무질서 → 과적합 →
+                  <strong>원형 구조</strong><br />출처: Liu et al. (2022),
+                  "Towards Understanding Grokking"
+                </div>
+              </div>
+            </div>
           </div>
           <div class="box box-red">
-            <div class="box-title">한계와 대비</div>
-            <div class="box-body" style="font-size:30px;">Grokking은 조건에 민감해 나타나지 않을 수 있음 — 미발현 시나리오도 해석 계획에 포함</div>
+            <div class="box-title">공통 한계</div>
+            <div class="box-body">
+              기존 연구는 모두 <strong>a ∘ b mod p → 답 하나</strong>를 맞히는
+              단일 토큰 분류 — 출력이 구조를 가진 <strong>수열</strong>인 경우는
+              아직 탐구되지 않았다
+            </div>
           </div>
         </div>
       </div>
-      <div class="box-dark txt-center">미발현조차 답이 된다 — <strong>"어떤 구조가 Grokking을 막는가"</strong></div>
+
+      <!-- ═══════════ 5. S3 연구 목표·독창성 ═══════════ -->
+      <div class="slide" id="slide-5">
+        <div class="slide-header">
+          <span class="chapter-label">연구 목표</span>
+          <span class="page-num">5 / 11</span>
+        </div>
+        <div class="title-zone">
+          <h1 class="slide-title">왜 '정렬'인가 — 연구 목표와 독창성</h1>
+          <p class="slide-subtitle">
+            출력 전체가 수열인 seq2seq 과제로 Grokking 연구를 확장한다
+          </p>
+        </div>
+        <div class="content-zone top-260 justify-between" style="gap: 28px">
+          <ul class="bullet-list">
+            <li>
+              답 하나 예측과 달리, 수열 출력은
+              <strong>출력 전체에 걸친 구조적 일관성</strong>이 필요하다
+            </li>
+            <li>
+              정렬은 원소 간 <strong>비교</strong>와
+              <strong>자리 배치</strong>가 결합된 가장 단순한 구조적 과제다
+            </li>
+          </ul>
+          <div class="cols" style="gap: 44px">
+            <div class="compare-card" style="padding: 36px">
+              <div class="cc-head">기존 연구 — 단일 토큰 분류</div>
+              <div class="cc-main">
+                <span>a ∘ b mod p</span><span class="flow-arrow">→</span
+                ><span class="tile in">c</span>
+              </div>
+              <div class="cc-cap">출력 = 토큰 하나</div>
+            </div>
+            <div class="compare-card accent" style="padding: 36px">
+              <div class="cc-head">본 연구 — seq2seq 정렬</div>
+              <div class="cc-main">
+                <div class="tile-row">
+                  <div class="tile in">3</div>
+                  <div class="tile in">1</div>
+                  <div class="tile in">4</div>
+                  <div class="tile in">1</div>
+                  <div class="tile in">5</div>
+                </div>
+                <span class="flow-arrow">→</span>
+                <div class="tile-row">
+                  <div class="tile r0">1</div>
+                  <div class="tile r0">1</div>
+                  <div class="tile r0">3</div>
+                  <div class="tile r0">4</div>
+                  <div class="tile r0">5</div>
+                </div>
+              </div>
+              <div class="cc-cap">출력 = 구조를 가진 수열 전체</div>
+            </div>
+          </div>
+          <div class="cols" style="gap: 44px">
+            <div class="box box-gray col">
+              <div class="box-title">독창성 1</div>
+              <div class="box-body" style="font-size: 30px">
+                출력이 '구조를 가진 수열'인 <strong>첫 Grokking 연구</strong>
+              </div>
+            </div>
+            <div class="box box-gray col">
+              <div class="box-title">독창성 2</div>
+              <div class="box-body" style="font-size: 30px">
+                정렬 규칙 자체를 <strong>실험 변수</strong>로 조작해 구조의
+                영향을 분리
+              </div>
+            </div>
+          </div>
+          <div class="box-dark txt-center">
+            <strong>연구 목표</strong> — 정렬 과제에서 Grokking의 발현 조건을
+            검증하고, 완성된 모델의 내부 표현 구조를 분석한다
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 6. S4 연구 문제 ═══════════ -->
+      <div class="slide" id="slide-6">
+        <div class="slide-header">
+          <span class="chapter-label">연구 문제</span>
+          <span class="page-num">6 / 11</span>
+        </div>
+        <div class="title-zone">
+          <h1 class="slide-title">연구 문제</h1>
+          <p class="slide-subtitle">발현 여부 → 내부 구조 → 진행 양상</p>
+        </div>
+        <div class="content-zone top-260 justify-between" style="gap: 14px">
+          <div class="rq-card">
+            <span class="rq-num">RQ 1</span>
+            <span class="rq-q"
+              >정렬 과제에서 Grokking이 <strong>발현되는가</strong>?<br />정렬
+              규칙에 따라 발현 여부와 시점이 어떻게 달라지는가?</span
+            >
+          </div>
+          <div class="rq-card">
+            <span class="rq-num">RQ 2</span>
+            <span class="rq-q"
+              >Grokking이 완료된 모델의 <strong>내부 표현</strong>은 어떤 구조를
+              가지는가?</span
+            >
+          </div>
+          <div class="rq-card">
+            <span class="rq-num">RQ 3</span>
+            <span class="rq-q"
+              >Grokking은 출력 전체에서
+              <strong>한 번에</strong> 일어나는가,<br />출력
+              <strong>그룹 단위</strong>로 나뉘어 일어나는가?</span
+            >
+          </div>
+          <div class="box box-gray">
+            <div class="box-body" style="font-size: 30px">
+              ※ Grokking이 나타나지 않을경우
+              <strong>"어떤 구조가 일반화를 막는가"</strong>에 대한 결과로
+              해석할 수 있음
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 7. S5 실험 설계 ① ═══════════ -->
+      <div class="slide" id="slide-7">
+        <div class="slide-header">
+          <span class="chapter-label">실험 설계</span>
+          <span class="page-num">7 / 11</span>
+        </div>
+        <div class="title-zone">
+          <h1 class="slide-title">실험 설계 ① — 세 가지 정렬 규칙</h1>
+          <p class="slide-subtitle">
+            정렬 키(항등 / 주기) × 위치 매핑(단조 / 비단조)
+          </p>
+        </div>
+        <div class="content-zone top-260" style="gap: 22px">
+          <div class="sort-diagram">
+            <div class="sort-input">
+              <span class="si-label">입력 수열</span>
+              <div class="tile-row">
+                <div class="tile in">3</div>
+                <div class="tile in">1</div>
+                <div class="tile in">4</div>
+                <div class="tile in">1</div>
+                <div class="tile in">5</div>
+              </div>
+              <span class="txt-sm txt-muted">(순서는 무작위)</span>
+            </div>
+            <div class="sort-branches">
+              <div class="sort-col">
+                <div class="sc-arrow">↓</div>
+                <div class="sc-name">기준 A — 오름차순</div>
+                <div class="tile-row">
+                  <div class="tile">1</div>
+                  <div class="tile">1</div>
+                  <div class="tile">3</div>
+                  <div class="tile">4</div>
+                  <div class="tile">5</div>
+                </div>
+                <div class="sc-cap">
+                  값 그대로 작은 것부터<br /><span class="txt-accent txt-bold"
+                    >기준선</span
+                  >
+                </div>
+              </div>
+              <div class="sort-col">
+                <div class="sc-arrow">↓</div>
+                <div class="sc-name">기준 B — 잉여류 (mod 3)</div>
+                <div>
+                  <div class="tile-row">
+                    <div class="tile r0">3</div>
+                    <div class="tile r1">1</div>
+                    <div class="tile r1">1</div>
+                    <div class="tile r1">4</div>
+                    <div class="tile r2">5</div>
+                  </div>
+                  <div class="residue-row">
+                    <span>0</span><span>1</span><span>1</span><span>1</span
+                    ><span>2</span>
+                  </div>
+                </div>
+                <div class="sc-cap">
+                  나머지가 작은 묶음부터,<br />같은 묶음 안에서는 값 오름차순
+                </div>
+              </div>
+              <div class="sort-col">
+                <div class="sc-arrow">↓</div>
+                <div class="sc-name">기준 C — 최솟값·최댓값 교번</div>
+                <div class="tile-row">
+                  <div class="tile">1</div>
+                  <div class="tile">5</div>
+                  <div class="tile">1</div>
+                  <div class="tile">4</div>
+                  <div class="tile">3</div>
+                </div>
+                <div class="sc-cap">
+                  최소 → 최대 → 2번째 최소 →<br />2번째 최대 → …
+                </div>
+              </div>
+            </div>
+          </div>
+          <table class="class-table compact">
+            <thead>
+              <tr>
+                <th style="width: 22%">기준</th>
+                <th style="width: 24%">정렬 키</th>
+                <th style="width: 24%">위치 매핑</th>
+                <th>검증 대상</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="cnt">A 오름차순</td>
+                <td>항등 (값 그대로)</td>
+                <td>단조</td>
+                <td>Grokking 발현의 기준선</td>
+              </tr>
+              <tr>
+                <td class="cnt">B 잉여류</td>
+                <td class="highlight">주기 (x mod m)</td>
+                <td>단조</td>
+                <td>주기 구조가 들어갔을 때의 변화</td>
+              </tr>
+              <tr>
+                <td class="cnt">C 교번</td>
+                <td>항등 (값 그대로)</td>
+                <td class="highlight">비단조</td>
+                <td>비단조의 grokking 여부</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════ 8. S6 실험 설계 ② ═══════════ -->
+      <div class="slide" id="slide-8">
+        <div class="slide-header">
+          <span class="chapter-label">실험 설계</span>
+          <span class="page-num">8 / 11</span>
+        </div>
+        <div class="title-zone">
+          <h1 class="slide-title">실험 설계 ② — 모델과 데이터</h1>
+          <p class="slide-subtitle">Grokking이 관찰될 수 있는 조건</p>
+        </div>
+        <div class="content-zone top-260 justify-between" style="gap: 30px">
+          <div class="flow-row">
+            <div class="flow-node">
+              <span class="fn-name">입력 수열</span
+              ><span class="fn-cap">(3, 1, 4, 1, 5)</span>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node accent">
+              <span class="fn-name">Encoder</span
+              ><span class="fn-cap">입력 전체를 벡터로 변환</span>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node accent">
+              <span class="fn-name">Decoder</span
+              ><span class="fn-cap">한 토큰씩 자기회귀 생성</span>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node dark">
+              <span class="fn-name">출력 수열</span
+              ><span class="fn-cap">(1, 1, 3, 4, 5)</span>
+            </div>
+          </div>
+          <div class="txt-center txt-muted" style="font-size: 27px">
+            세 정렬 기준 모두
+            <p style="color: var(--c-ink)">같은 모델·같은 데이터 규모로 학습</p>
+          </div>
+
+          <div class="cols" style="gap: 40px">
+            <div class="box box-blue col">
+              <div class="box-title">모델</div>
+              <div class="box-body" style="font-size: 31px">
+                소규모 encoder-decoder<br />Transformer<br />
+              </div>
+            </div>
+            <div class="box box-blue col">
+              <div class="box-title">데이터</div>
+              <div class="box-body" style="font-size: 31px">
+                값 10~12종, 길이 5~6의 수열을<br />multiset 단위로 분할
+              </div>
+            </div>
+            <div class="box box-blue col">
+              <div class="box-title">학습</div>
+              <div class="box-body" style="font-size: 31px">
+                AdamW + 강한 weight decay<br />최대 10⁶ step 장기 학습<br />기준별
+                5개 시드 반복
+              </div>
+            </div>
+          </div>
+          <div class="box-dark txt-center">
+            암기가 가능한 규모여야 Grokking을 관찰할 수 있기에 데이터셋을 작게
+            제한
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 9. S7 연구 방법 ═══════════ -->
+      <div class="slide" id="slide-9">
+        <div class="slide-header">
+          <span class="chapter-label">연구 방법</span>
+          <span class="page-num">9 / 11</span>
+        </div>
+        <div class="title-zone">
+          <h1 class="slide-title">연구 방법 — 연구 문제별 분석 계획</h1>
+        </div>
+        <div class="content-zone top-210" style="gap: 34px">
+          <table class="class-table">
+            <thead>
+              <tr>
+                <th style="width: 20%">연구 문제</th>
+                <th style="width: 30%">분석 방법</th>
+                <th>무엇을 확인하는가</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="cnt">RQ 1 발현</td>
+                <td>학습 곡선 분석</td>
+                <td>훈련·검증 정확도 곡선, Grokking gap을 정렬 기준 간 비교</td>
+              </tr>
+              <tr>
+                <td class="cnt">RQ 2 구조</td>
+                <td>내부 표현 분석</td>
+                <td>
+                  임베딩 차원 축소(PCA)를 이용하여 수직선·군집·주기 구조가
+                  형성되는지 확인
+                </td>
+              </tr>
+              <tr>
+                <td class="cnt">RQ 3 양상</td>
+                <td>출력 연속성 분석</td>
+                <td>
+                  Token별 정확도와 전체 정확도를 비교하여 출력의 연속성 확인
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="cols" style="gap: 40px">
+            <div class="box box-gray col">
+              <div class="box-body" style="font-size: 30px">
+                모델 크기 · 학습률 · 데이터 비율을 세 기준 모두에서 동일하게
+                고정
+              </div>
+            </div>
+            <div class="box box-gray col">
+              <div class="box-body" style="font-size: 30px">
+                기준마다 시드 5개 반복 — 발현 여부와 시점을 분포로 확인
+              </div>
+            </div>
+            <div class="box box-gray col">
+              <div class="box-body" style="font-size: 30px">
+                최대 step까지 미발현이면 "관찰되지 않음"으로 기록하고 해석
+              </div>
+            </div>
+          </div>
+          <div style="height: 50px"></div>
+          <div class="box-dark txt-center">
+            곡선은 <strong>'언제'</strong>, 표현은 <strong>'무엇을'</strong>,
+            연속성은 <strong>'어떻게'</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 10. S8 예상 결과·기대효과 ═══════════ -->
+      <div class="slide" id="slide-10">
+        <div class="slide-header">
+          <span class="chapter-label">예상 결과</span>
+          <span class="page-num">10 / 11</span>
+        </div>
+        <div class="title-zone">
+          <h1 class="slide-title">예상 결과와 기대효과</h1>
+        </div>
+        <div class="content-zone top-260 justify-between" style="gap: 30px">
+          <div class="cols" style="gap: 56px">
+            <div
+              class="col"
+              style="display: flex; flex-direction: column; gap: 22px"
+            >
+              <div class="section-label">예상 결과</div>
+              <div class="hypo-card" style="padding: 30px 34px">
+                <span class="hypo-num">①</span
+                ><span class="hypo-body"
+                  >규칙이 복잡할수록(B·C) Grokking이
+                  <strong>더 늦거나 나타나지 않을 것</strong></span
+                >
+              </div>
+              <div class="hypo-card" style="padding: 30px 34px">
+                <span class="hypo-num">②</span
+                ><span class="hypo-body"
+                  >기준 B의 임베딩에서 <strong>주기·군집 구조</strong>가 관찰될
+                  것</span
+                >
+              </div>
+              <div class="hypo-card" style="padding: 30px 34px">
+                <span class="hypo-num">③</span
+                ><span class="hypo-body"
+                  >출력 <strong>그룹 단위의 부분적 Grokking</strong>이 관찰될
+                  것</span
+                >
+              </div>
+            </div>
+            <div
+              class="col"
+              style="display: flex; flex-direction: column; gap: 22px"
+            >
+              <div class="section-label">기대효과</div>
+              <div class="box box-green">
+                <div class="box-body" style="font-size: 31px">
+                  Grokking 연구를 단일 토큰 분류에서
+                  <strong>구조적 수열 출력</strong>으로 확장하는 첫 시도
+                </div>
+              </div>
+              <div class="box box-gray">
+                <div class="box-body" style="font-size: 31px">
+                  소규모 Transformer가
+                  <strong>무엇을, 어떤 구조로 학습하는지</strong>에 대한 이해에
+                  기여
+                </div>
+              </div>
+              <div class="box box-red">
+                <div class="box-body" style="font-size: 30px">
+                  Grokking은 조건에 민감해 나타나지 않을 수 있음 — 미발현
+                  시나리오도 해석 계획에 포함
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 11. OUTRO ═══════════ -->
+      <div class="slide slide-outro" id="slide-11">
+        <div class="outro-inner">
+          <div class="outro-main">감사합니다</div>
+          <div class="outro-sub">
+            팀 어텐션 / 김서혁 · 손영우<br />
+            지도교사 김준우
+          </div>
+        </div>
+        <div class="cover-line"></div>
+      </div>
     </div>
-  </div>
 
-  <!-- ═══════════ 11. OUTRO ═══════════ -->
-  <div class="slide slide-outro" id="slide-11">
-    <div class="outro-inner">
-      <div class="outro-main">감사합니다</div>
-      <div class="outro-sub">팀 어텐션 · 김서혁 · 손영우 · 지도교사 김준우<br>질문을 환영합니다</div>
+    <!-- Navigation Bar -->
+    <div id="nav-bar">
+      <button id="btn-prev">◀</button>
+      <span id="slide-counter">1 / 11</span>
+      <button id="btn-next">▶</button>
     </div>
-    <div class="cover-line"></div>
-  </div>
 
-</div>
-
-<!-- Navigation Bar -->
-<div id="nav-bar">
-  <button id="btn-prev">◀</button>
-  <span id="slide-counter">1 / 11</span>
-  <button id="btn-next">▶</button>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-<script src="slide.js"></script>
-</body>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script src="slide.js"></script>
+  </body>
 </html>
