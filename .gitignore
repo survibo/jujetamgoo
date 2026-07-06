@@ -7,3 +7,4 @@ pytorch-env/
 .venv/
 .venv312/
 outputs/
+.vercel
