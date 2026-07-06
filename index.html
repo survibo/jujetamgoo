@@ -43,19 +43,17 @@
             <li class="toc-item">
               <span class="toc-num">01</span
               ><span class="toc-text">연구 배경 — Grokking이란?</span
-              ><span class="toc-note">암기 뒤에 찾아오는 지연된 일반화</span>
+              ><span class="toc-note">지연된 일반화</span>
             </li>
             <li class="toc-item">
               <span class="toc-num">02</span
               ><span class="toc-text">선행 연구와 그 한계</span
-              ><span class="toc-note"
-                >답 하나를 맞히는 문제에 머문 기존 연구</span
-              >
+              ><span class="toc-note">수열에서의 Grokking</span>
             </li>
             <li class="toc-item">
               <span class="toc-num">03</span
               ><span class="toc-text">연구 목표와 독창성</span
-              ><span class="toc-note">왜 '정렬'인가</span>
+              ><span class="toc-note">왜 정렬인가</span>
             </li>
             <li class="toc-item">
               <span class="toc-num">04</span
@@ -65,7 +63,7 @@
             <li class="toc-item">
               <span class="toc-num">05</span
               ><span class="toc-text">실험 설계</span
-              ><span class="toc-note">세 가지 정렬 규칙 · 모델과 데이터</span>
+              ><span class="toc-note">세 가지 정렬 규칙</span>
             </li>
             <li class="toc-item">
               <span class="toc-num">06</span
@@ -124,9 +122,10 @@
               <div class="box box-gray">
                 <div class="box-title">GROKKING GAP</div>
                 <div class="box-body">
-                  암기 완료 시점과 일반화 시점 사이의 간격<br>
-                   — 본 연구의 핵심 측정량<br /><span
-                    class="txt-sm txt-muted">(본 연구의 조작적 정의)</span>
+                  암기 완료 시점과 일반화 시점 사이의 간격<br />
+                  — 본 연구의 핵심 측정량<br /><span class="txt-sm txt-muted"
+                    >(본 연구의 조작적 정의)</span
+                  >
                 </div>
               </div>
               <div class="txt-sm txt-muted" style="padding-left: 8px">
@@ -135,8 +134,8 @@
             </div>
           </div>
           <div class="box-dark txt-center">
-            "과적합 이후의 학습은 무의미하다"는 기존 상식에 대한
-            <strong>반례</strong> — 이 <strong>Grokking</strong> 현상이 본 연구의 출발점
+            "과적합 이후의 학습은 무의미하다"는 기존 상식에 대한 반례 —
+            <strong>Grokking</strong> 현상이 본 연구의 출발점
           </div>
         </div>
       </div>
@@ -172,8 +171,9 @@
               <div class="box box-blue">
                 <div class="box-title">MURTY ET AL. (2023)</div>
                 <div class="box-body" style="font-size: 31px">
-                  문장 변환 seq2seq에서 <strong>구조 규칙의 지연 습득</strong
-                  >(structural grokking) 보고
+                  문장 변환 seq2seq에서
+                  <strong>구조 규칙의 지연 습득</strong>(structural grokking)
+                  보고
                 </div>
               </div>
             </div>
@@ -196,8 +196,8 @@
             <div class="box-title">요약</div>
             <div class="box-body">
               Grokking 연구는 단일 토큰 분류에서 문장 변환까지 확장되어 왔지만,
-              <strong>출력 전체가 하나의 전역 순서 제약을 지켜야 하는 '정렬'에 관한 연구</strong
-              >는 최초로 보임
+              출력 전체가 하나의 전역 순서 제약을 지켜야 하는
+              <strong>정렬에 관한 연구</strong>는 최초로 보임
             </div>
           </div>
         </div>
@@ -261,20 +261,20 @@
             <div class="box box-gray col">
               <div class="box-title">독창성 1</div>
               <div class="box-body" style="font-size: 30px">
-                <strong>정렬 과제</strong>에서
-                Grokking을 분석하는 첫 시도
+                <strong>정렬 과제</strong>에서 Grokking을 분석하는 첫 시도
               </div>
             </div>
             <div class="box box-gray col">
               <div class="box-title">독창성 2</div>
               <div class="box-body" style="font-size: 30px">
-                <strong>두 개의 독립 축</strong>(키의 주기성 × 매핑의 단조성)으로 분해해 구조의 영향을 축별로 분리하여 측정
+                <strong>두 개의 독립 축</strong>(키의 주기성 × 매핑의
+                단조성)으로 분해해 구조의 영향을 축별로 분리하여 측정
               </div>
             </div>
           </div>
           <div class="box-dark txt-center">
             <strong>연구 목표</strong> — 정렬 과제에서 Grokking의 발현 조건을
-            검증하고, 완성된 모델의 내부 표현 구조를 분석한다
+            검증하고, 완성된 모델의 내부 표현 구조 분석
           </div>
         </div>
       </div>
@@ -289,12 +289,13 @@
           <h1 class="slide-title">연구 문제</h1>
           <p class="slide-subtitle">발현 여부 → 내부 구조 → 진행 양상</p>
         </div>
-        <div class="content-zone top-260" style="gap: 27px;">
+        <div class="content-zone top-260" style="gap: 27px">
           <div class="rq-card">
             <span class="rq-num">RQ 1</span>
             <span class="rq-q"
               >정렬 과제에서 Grokking이 <strong>발현되는가</strong>?<br />정렬
-              규칙에 따라 <strong>발현 여부</strong>와 <strong>시점</strong>이 어떻게 달라지는가?</span
+              규칙에 따라 <strong>발현 여부</strong>와 <strong>시점</strong>이
+              어떻게 달라지는가?</span
             >
           </div>
           <div class="rq-card">
@@ -402,7 +403,7 @@
                 <td class="cnt">A 오름차순</td>
                 <td>항등 (값 그대로)</td>
                 <td>단조</td>
-                <td>Grokking 발현의 기준선</td>
+                <td>Grokking 발현의 기준</td>
               </tr>
               <tr>
                 <td class="cnt">B 잉여류</td>
@@ -474,7 +475,7 @@
             <div class="box box-blue col">
               <div class="box-title">학습</div>
               <div class="box-body" style="font-size: 31px">
-                AdamW + 강한 weight decay<br />최대 10⁶ step 장기 학습<br />기준별
+                AdamW(강한 weight decay)<br />최대 10⁶ step 장기 학습<br />기준별
                 5개 시드 반복
               </div>
             </div>
@@ -530,7 +531,8 @@
           <div class="cols" style="gap: 40px">
             <div class="box box-gray col">
               <div class="box-body" style="font-size: 30px">
-                모델 크기 · 학습률 · 데이터 비율을 세 기준 모두에서 동일하게 고정
+                모델 크기 · 학습률 · 데이터 비율을 세 기준 모두에서 동일하게
+                고정
               </div>
             </div>
             <div class="box box-gray col">
@@ -540,7 +542,7 @@
             </div>
             <div class="box box-gray col">
               <div class="box-body" style="font-size: 30px">
-                설정한 최대 step까지 미발현이면 "관찰되지 않음"으로 기록하고 해석
+                설정한 최대 step까지 미발현이면 '관찰되지 않음'으로 해석
               </div>
             </div>
           </div>
