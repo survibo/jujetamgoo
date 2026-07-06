@@ -22,7 +22,7 @@
             암기를 넘어 — 모델은 언제, 어떻게 규칙을 깨치는가
           </p>
           <div class="cover-meta">
-            <div>팀 어텐션 · 김서혁 · 손영우</div>
+            <div>팀 어텐션 / 김서혁 · 손영우</div>
             <div>지도교사 김준우</div>
           </div>
         </div>
@@ -75,7 +75,7 @@
             <li class="toc-item">
               <span class="toc-num">07</span
               ><span class="toc-text">예상 결과와 기대효과</span
-              ><span class="toc-note">어느 쪽이 나와도 해석 가능한 설계</span>
+              ><span class="toc-note">결과 해석에 관한 설계</span>
             </li>
           </ol>
         </div>
@@ -90,7 +90,7 @@
         <div class="title-zone">
           <h1 class="slide-title">Grokking이란?</h1>
           <p class="slide-subtitle">
-            다 외운 줄 알았던 모델이, 한참 뒤에 갑자기 규칙을 깨친다
+            과적합 단계의 모델이, 한참 뒤에 갑자기 규칙을 습득
           </p>
         </div>
         <div class="content-zone top-260" style="gap: 24px">
@@ -124,8 +124,9 @@
               <div class="box box-gray">
                 <div class="box-title">GROKKING GAP</div>
                 <div class="box-body">
-                  암기 완료 시점과 일반화 시점 사이의 간격 — 본 연구의 핵심
-                  측정량
+                  암기 완료 시점과 일반화 시점 사이의 간격<br>
+                   — 본 연구의 핵심 측정량<br /><span
+                    class="txt-sm txt-muted">(본 연구의 조작적 정의)</span>
                 </div>
               </div>
               <div class="txt-sm txt-muted" style="padding-left: 8px">
@@ -134,8 +135,8 @@
             </div>
           </div>
           <div class="box-dark txt-center">
-            "과적합 이후의 학습은 무의미하다"는 통념에 대한
-            <strong>반례</strong> — 이 현상이 본 연구의 출발점
+            "과적합 이후의 학습은 무의미하다"는 기존 상식에 대한
+            <strong>반례</strong> — 이 <strong>Grokking</strong> 현상이 본 연구의 출발점
           </div>
         </div>
       </div>
@@ -162,17 +163,17 @@
                 </div>
               </div>
               <div class="box box-blue">
-                <div class="box-title">NANDA ET AL. (2023)</div>
-                <div class="box-body" style="font-size: 31px">
-                  모델 내부에 <strong>Fourier 알고리즘 회로</strong>가 형성됨을
-                  규명
-                </div>
-              </div>
-              <div class="box box-blue">
                 <div class="box-title">LIU ET AL. (2022)</div>
                 <div class="box-body" style="font-size: 31px">
                   임베딩이 <strong>원형 구조로 수렴</strong>하는 표현 학습 관점
                   제시
+                </div>
+              </div>
+              <div class="box box-blue">
+                <div class="box-title">MURTY ET AL. (2023)</div>
+                <div class="box-body" style="font-size: 31px">
+                  문장 변환 seq2seq에서 <strong>구조 규칙의 지연 습득</strong
+                  >(structural grokking) 보고
                 </div>
               </div>
             </div>
@@ -192,11 +193,11 @@
             </div>
           </div>
           <div class="box box-red">
-            <div class="box-title">공통 한계</div>
+            <div class="box-title">요약</div>
             <div class="box-body">
-              기존 연구는 모두 <strong>a ∘ b mod p → 답 하나</strong>를 맞히는
-              단일 토큰 분류 — 출력이 구조를 가진 <strong>수열</strong>인 경우는
-              아직 탐구되지 않았다
+              Grokking 연구는 단일 토큰 분류에서 문장 변환까지 확장되어 왔지만,
+              <strong>출력 전체가 하나의 전역 순서 제약을 지켜야 하는 '정렬'에 관한 연구</strong
+              >는 최초로 보임
             </div>
           </div>
         </div>
@@ -209,20 +210,20 @@
           <span class="page-num">5 / 11</span>
         </div>
         <div class="title-zone">
-          <h1 class="slide-title">왜 '정렬'인가 — 연구 목표와 독창성</h1>
+          <h1 class="slide-title">연구 목표와 독창성</h1>
           <p class="slide-subtitle">
-            출력 전체가 수열인 seq2seq 과제로 Grokking 연구를 확장한다
+            출력 전체가 수열인 seq2seq 과제로 Grokking 연구를 확장
           </p>
         </div>
         <div class="content-zone top-260 justify-between" style="gap: 28px">
           <ul class="bullet-list">
             <li>
               답 하나 예측과 달리, 수열 출력은
-              <strong>출력 전체에 걸친 구조적 일관성</strong>이 필요하다
+              <strong>출력 전체에 걸친 구조적 일관성</strong>이 필요
             </li>
             <li>
               정렬은 원소 간 <strong>비교</strong>와
-              <strong>자리 배치</strong>가 결합된 가장 단순한 구조적 과제다
+              <strong>자리 배치</strong>가 결합된 가장 단순한 구조적 과제
             </li>
           </ul>
           <div class="cols" style="gap: 44px">
@@ -260,14 +261,14 @@
             <div class="box box-gray col">
               <div class="box-title">독창성 1</div>
               <div class="box-body" style="font-size: 30px">
-                출력이 '구조를 가진 수열'인 <strong>첫 Grokking 연구</strong>
+                <strong>정렬 과제</strong>에서
+                Grokking을 분석하는 첫 시도
               </div>
             </div>
             <div class="box box-gray col">
               <div class="box-title">독창성 2</div>
               <div class="box-body" style="font-size: 30px">
-                정렬 규칙 자체를 <strong>실험 변수</strong>로 조작해 구조의
-                영향을 분리
+                <strong>두 개의 독립 축</strong>(키의 주기성 × 매핑의 단조성)으로 분해해 구조의 영향을 축별로 분리하여 측정
               </div>
             </div>
           </div>
@@ -288,18 +289,18 @@
           <h1 class="slide-title">연구 문제</h1>
           <p class="slide-subtitle">발현 여부 → 내부 구조 → 진행 양상</p>
         </div>
-        <div class="content-zone top-260 justify-between" style="gap: 14px">
+        <div class="content-zone top-260" style="gap: 27px;">
           <div class="rq-card">
             <span class="rq-num">RQ 1</span>
             <span class="rq-q"
               >정렬 과제에서 Grokking이 <strong>발현되는가</strong>?<br />정렬
-              규칙에 따라 발현 여부와 시점이 어떻게 달라지는가?</span
+              규칙에 따라 <strong>발현 여부</strong>와 <strong>시점</strong>이 어떻게 달라지는가?</span
             >
           </div>
           <div class="rq-card">
             <span class="rq-num">RQ 2</span>
             <span class="rq-q"
-              >Grokking이 완료된 모델의 <strong>내부 표현</strong>은 어떤 구조를
+              >Grokking이 완료된 모델의 <strong>임베딩 값</strong>은 어떤 구조를
               가지는가?</span
             >
           </div>
@@ -310,13 +311,6 @@
               <strong>한 번에</strong> 일어나는가,<br />출력
               <strong>그룹 단위</strong>로 나뉘어 일어나는가?</span
             >
-          </div>
-          <div class="box box-gray">
-            <div class="box-body" style="font-size: 30px">
-              ※ Grokking이 나타나지 않을경우
-              <strong>"어떤 구조가 일반화를 막는가"</strong>에 대한 결과로
-              해석할 수 있음
-            </div>
           </div>
         </div>
       </div>
@@ -357,11 +351,6 @@
                   <div class="tile">4</div>
                   <div class="tile">5</div>
                 </div>
-                <div class="sc-cap">
-                  값 그대로 작은 것부터<br /><span class="txt-accent txt-bold"
-                    >기준선</span
-                  >
-                </div>
               </div>
               <div class="sort-col">
                 <div class="sc-arrow">↓</div>
@@ -380,7 +369,7 @@
                   </div>
                 </div>
                 <div class="sc-cap">
-                  나머지가 작은 묶음부터,<br />같은 묶음 안에서는 값 오름차순
+                  나머지 오름차순<br />같은 묶음 안에서는 값 오름차순
                 </div>
               </div>
               <div class="sort-col">
@@ -479,7 +468,7 @@
             <div class="box box-blue col">
               <div class="box-title">데이터</div>
               <div class="box-body" style="font-size: 31px">
-                값 10~12종, 길이 5~6의 수열을<br />multiset 단위로 분할
+                값 10~12종, 길이 5~6의 정수 수열을<br />multiset 단위로 분할
               </div>
             </div>
             <div class="box box-blue col">
@@ -541,8 +530,7 @@
           <div class="cols" style="gap: 40px">
             <div class="box box-gray col">
               <div class="box-body" style="font-size: 30px">
-                모델 크기 · 학습률 · 데이터 비율을 세 기준 모두에서 동일하게
-                고정
+                모델 크기 · 학습률 · 데이터 비율을 세 기준 모두에서 동일하게 고정
               </div>
             </div>
             <div class="box box-gray col">
@@ -552,7 +540,7 @@
             </div>
             <div class="box box-gray col">
               <div class="box-body" style="font-size: 30px">
-                최대 step까지 미발현이면 "관찰되지 않음"으로 기록하고 해석
+                설정한 최대 step까지 미발현이면 "관찰되지 않음"으로 기록하고 해석
               </div>
             </div>
           </div>
@@ -573,7 +561,32 @@
         <div class="title-zone">
           <h1 class="slide-title">예상 결과와 기대효과</h1>
         </div>
-        <div class="content-zone top-260 justify-between" style="gap: 30px">
+        <div class="content-zone top-260" style="gap: 30px">
+          <div
+            style="
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              gap: 44px;
+              background: var(--c-white);
+              border-radius: 12px;
+              padding: 16px 28px;
+              font-size: 27px;
+            "
+          >
+            <span class="txt-muted">복습 — 입력 (3,1,4,1,5) →</span>
+            <span
+              ><strong class="txt-accent">기준 A</strong> 오름차순
+              (1,1,3,4,5)</span
+            >
+            <span
+              ><strong class="txt-accent">기준 B</strong> 잉여류 mod 3
+              (3,1,1,4,5)</span
+            >
+            <span
+              ><strong class="txt-accent">기준 C</strong> 교번 (1,5,1,4,3)</span
+            >
+          </div>
           <div class="cols" style="gap: 56px">
             <div
               class="col"
@@ -583,8 +596,8 @@
               <div class="hypo-card" style="padding: 30px 34px">
                 <span class="hypo-num">①</span
                 ><span class="hypo-body"
-                  >규칙이 복잡할수록(B·C) Grokking이
-                  <strong>더 늦거나 나타나지 않을 것</strong></span
+                  >더 복잡한 규칙(B·C)에서는 기준선(A)에서보다 Grokking이
+                  <strong>더 늦게 나타나거나, 나타나지 않을 것</strong></span
                 >
               </div>
               <div class="hypo-card" style="padding: 30px 34px">
@@ -609,8 +622,8 @@
               <div class="section-label">기대효과</div>
               <div class="box box-green">
                 <div class="box-body" style="font-size: 31px">
-                  Grokking 연구를 단일 토큰 분류에서
-                  <strong>구조적 수열 출력</strong>으로 확장하는 첫 시도
+                  Grokking 연구를 <strong>전역 순서 제약을 가진 '정렬'</strong>
+                  과제로 확장 (기존 문장 변환·복사 보고와 구별되는 지점)
                 </div>
               </div>
               <div class="box box-gray">
@@ -621,6 +634,7 @@
                 </div>
               </div>
               <div class="box box-red">
+                <div class="box-title">한계와 대비</div>
                 <div class="box-body" style="font-size: 30px">
                   Grokking은 조건에 민감해 나타나지 않을 수 있음 — 미발현
                   시나리오도 해석 계획에 포함

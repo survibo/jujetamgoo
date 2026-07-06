@@ -218,11 +218,11 @@ function drawGrokkingGraph() {
   g.gapArrow(tTrain, tVal, 0.56);
   g.centeredText((tTrain + tVal) / 2, 0.62, 'Grokking gap', '#1d1d1f', 26, 600);
 
-  g.text(tTrain, 1.08, '암기 완료', '#0066cc', 12, 0, 21);
-  g.centeredText(tVal, 1.08, '일반화!', '#c0392b', 21, 600);
+  g.text(tTrain, 1.08, '암기 완료', '#0066cc', 12, 0, 22);
+  g.centeredText(tVal, 1.08, '일반화', '#c0392b', 22, 600);
 
-  g.centeredText(10.5, 0.90, '훈련 정확도 100%', '#0066cc', 21, 400);
-  g.centeredText(20, 0.135, '검증 정확도는 오랫동안 바닥', '#c0392b', 21, 400);
+  g.centeredText(10.5, 0.90, '훈련 정확도 : 초기에 급격히 상승', '#0066cc', 22, 400);
+  g.centeredText(20, 0.135, '검증 정확도 : 충분히 긴 학습 후 급격히 상승', '#c0392b', 22, 400);
 
   // axis labels & ticks
   g.ticksX([0, 10, 20, 30, 40, 50], v => v === 0 ? '0' : `${v}k`, 30, 19);
