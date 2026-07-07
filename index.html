@@ -185,9 +185,8 @@
                   style="width: 880px"
                 />
                 <div class="graph-label">
-                  학습 단계별 임베딩: 무질서 → 과적합 →
-                  <strong>원형 구조</strong><br />출처: Liu et al. (2022),
-                  "Towards Understanding Grokking"
+                  출처: Murty et al. (2023), "Grokking of Hierachical Structure
+                  in Vanilla Transformers"
                 </div>
               </div>
             </div>
@@ -195,7 +194,7 @@
           <div class="box box-red">
             <div class="box-title">요약</div>
             <div class="box-body">
-              Grokking 연구는 단일 토큰 분류에서 문장 변환까지 확장되어 왔지만,
+              Grokking 연구는 단일 토큰 출력에서 문장 변환까지 확장되어 왔지만,
               출력 전체가 하나의 전역 순서 제약을 지켜야 하는
               <strong>정렬에 관한 연구</strong>는 최초로 보임
             </div>
@@ -228,9 +227,9 @@
           </ul>
           <div class="cols" style="gap: 44px">
             <div class="compare-card" style="padding: 36px">
-              <div class="cc-head">기존 연구 — 단일 토큰 분류</div>
+              <div class="cc-head">기존 연구 — 단일 토큰 출력</div>
               <div class="cc-main">
-                <span>a ∘ b mod p</span><span class="flow-arrow">→</span
+                <span>a ∘ b (mod p)</span><span class="flow-arrow">→</span
                 ><span class="tile in">c</span>
               </div>
               <div class="cc-cap">출력 = 토큰 하나</div>
@@ -665,8 +664,8 @@
         <div class="popup-window">
           <div class="popup-head">
             <span class="popup-badge"
-              >예비 실험 — 직접 학습한 microGPT 변형 (60,416 params) · a + b mod
-              87 · AdamW wd=1.0 · 훈련 데이터 40%</span
+              >MicroGPT 변형 (60,416 params) · a + b mod 87 · AdamW wd=1.0 ·
+              훈련 데이터 40%</span
             >
             <span class="popup-stageno" id="popup-stageno">1 / 3</span>
           </div>

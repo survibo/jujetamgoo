@@ -668,7 +668,7 @@ function animEmbedding() {
     if (finalHold) {
       ctx.fillStyle = "#1d1d1f";
       ctx.font = '400 25px "IBM Plex Sans KR","IBM Plex Sans",sans-serif';
-      ctx.fillText("반지름 편차 3.9% — 사실상 완전한 원", 950, 320);
+      ctx.fillText("반지름 편차 3.9%", 950, 320);
       ctx.fillText(
         `배열 순서: ${GROK_META.freq}·x mod ${GROK_META.modulus} (적합도 0.999)`,
         950,
