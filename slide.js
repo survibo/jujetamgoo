@@ -468,7 +468,7 @@ function animTerminal() {
     `vocab size: ${M.vocab}`,
     `num params: ${M.params}`,
     `device: ${M.device}`,
-    `train pairs: ${M.trainPairs} | validation pairs: ${M.heldOut}`,
+    `train pairs: ${M.trainPairs} | test pairs: ${M.heldOut}`,
   ].forEach((l) => push(l, 160));
 
   const REPLAY_END = 5000; // 2단계 그래프와 같은 범위
@@ -479,10 +479,10 @@ function animTerminal() {
       M.numSteps
     )} | train loss ${r[1].toFixed(4)} | train acc ${r[2].toFixed(
       3
-    )} | val loss ${r[3].toFixed(4)} | val acc ${r[4].toFixed(3)}`;
+    )} | test loss ${r[3].toFixed(4)} | test acc ${r[4].toFixed(3)}`;
     if (r[4] >= 0.5)
       line = line.replace(
-        /(val acc \d\.\d{3})$/,
+        /(test acc \d\.\d{3})$/,
         '<span class="tl-val">$1</span>'
       );
     push(line, 30); // 전 구간 일정한 속도
@@ -490,7 +490,7 @@ function animTerminal() {
 
   push("", 160);
   push(
-    `<span class="tl-dim">... step  5,050 ~ 20,000 : train/val 정확도 1.000 유지 (생략)</span>`,
+    `<span class="tl-dim">... step  5,050 ~ 20,000 : train/test 정확도 1.000 유지 (생략)</span>`,
     220
   );
   push("", 120);
