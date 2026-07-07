@@ -502,7 +502,7 @@ function animTerminal() {
     160
   );
   push(
-    `<span class="tl-note">validation: loss ${last[3].toFixed(4)} | accuracy ${
+    `<span class="tl-note">test:     loss ${last[3].toFixed(4)} | accuracy ${
       M.heldOut
     }/${M.heldOut} = 1.000</span>`,
     180
