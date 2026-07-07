@@ -327,7 +327,7 @@ function closePopup(markDone) {
 // 슬라이드 3에서 →/← 키가 팝업 단계를 제어. true를 반환하면 키를 소비한 것.
 function handlePopupNav(dir) {
   if (!HAS_GROK_DATA) return false;
-  if (current !== 3) { if (popupStage) closePopup(false); return false; }
+  if (current !== 4) { if (popupStage) closePopup(false); return false; }
   if (dir > 0) {
     if (popupStage === 0) { if (popupDone) return false; openPopup(1); return true; }
     if (popupStage < 3) { openPopup(popupStage + 1); return true; }
