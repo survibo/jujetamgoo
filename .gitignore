@@ -8,6 +8,6 @@ pytorch-env/
 .venv312/
 outputs/
 .vercel
-
+*.txt
 # 개인 학습용 주석본
 microgpt_annotated.py

@@ -29,9 +29,9 @@ if __name__ == "__main__":
         ratio = float(sys.argv[3])
     else:
         # 직접 수정해서 사용
-        input_path = "example.txt"
-        output_path = "example1.txt"
-        ratio = 0.6  # 30% 삭제
+        input_path = "temp.txt"
+        output_path = "temp1.txt"
+        ratio = 0.9  # 30% 삭제
 
     if not (0.0 <= ratio <= 1.0):
         print("오류: p는 0.0~1.0 사이여야 합니다.")

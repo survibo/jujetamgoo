@@ -1,4 +1,4 @@
-mod=87
+mod=54
 with open("example.txt", "w", encoding="utf-8") as f:
     for i in range(mod):
         for j in range(mod):
